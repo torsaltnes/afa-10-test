@@ -1,328 +1,381 @@
 # IMPLEMENTATION_PLAN.md
 
 ## 1. Overview
-Initialize a greenfield full-stack foundation with a Clean Architecture .NET 10 Web API in `backend/` and an Angular standalone application in `frontend/`.
-The backend exposes a compilable `GET /api/health` controller using C# primary constructor syntax.
-The frontend is scaffolded with `bootstrapApplication`, standalone components, and a signal-driven health feature.
-The structure is intentionally minimal, with no database, authentication, Swagger, or business features beyond health status.
+Initialize a greenfield full-stack baseline with a Clean Architecture .NET 10 Web API under `backend/` and an Angular standalone application under `frontend/`.
+The backend exposes a thin `GET /api/health` controller implemented with C# primary constructors and a minimal application/infrastructure split.
+The frontend bootstraps with `bootstrapApplication`, uses standalone components only, and manages UI state with Angular Signals.
+The scope stays intentionally small: no database, authentication, routing, or feature modules.
 
 ## 2. Folder structure and files to create
 ```text
-.gitignore                                                           (create)
+.gitignore                                                                      (create)
+global.json                                                                     (create)
 
-backend/GreenfieldArchitecture.sln                                   (create)
-backend/Directory.Build.props                                        (create)
-backend/Directory.Packages.props                                     (create)
+backend/GreenfieldArchitecture.sln                                              (create)
+backend/Directory.Build.props                                                   (create)
+backend/Directory.Packages.props                                                (create)
 
-backend/src/Core/Greenfield.Domain/Greenfield.Domain.csproj          (create)
-backend/src/Core/Greenfield.Domain/AssemblyReference.cs              (create)
+backend/src/Core/Greenfield.Domain/Greenfield.Domain.csproj                     (create)
+backend/src/Core/Greenfield.Domain/AssemblyReference.cs                         (create)
 
-backend/src/Core/Greenfield.Application/Greenfield.Application.csproj (create)
-backend/src/Core/Greenfield.Application/DependencyInjection.cs       (create)
-backend/src/Core/Greenfield.Application/Abstractions/Services/IHealthCheckService.cs (create)
-backend/src/Core/Greenfield.Application/Health/HealthCheckResult.cs  (create)
+backend/src/Core/Greenfield.Application/Greenfield.Application.csproj           (create)
+backend/src/Core/Greenfield.Application/DependencyInjection.cs                  (create)
+backend/src/Core/Greenfield.Application/Abstractions/Health/IHealthCheckService.cs (create)
+backend/src/Core/Greenfield.Application/Health/HealthCheckResult.cs             (create)
 
 backend/src/Infrastructure/Greenfield.Infrastructure/Greenfield.Infrastructure.csproj (create)
-backend/src/Infrastructure/Greenfield.Infrastructure/DependencyInjection.cs (create)
+backend/src/Infrastructure/Greenfield.Infrastructure/DependencyInjection.cs      (create)
 backend/src/Infrastructure/Greenfield.Infrastructure/Services/SystemHealthCheckService.cs (create)
 
-backend/src/Api/Greenfield.Api/Greenfield.Api.csproj                (create)
-backend/src/Api/Greenfield.Api/Program.cs                           (create)
-backend/src/Api/Greenfield.Api/appsettings.json                     (create)
-backend/src/Api/Greenfield.Api/appsettings.Development.json         (create)
-backend/src/Api/Greenfield.Api/Controllers/HealthCheckController.cs (create)
-backend/src/Api/Greenfield.Api/Contracts/HealthCheckResponse.cs     (create)
+backend/src/Api/Greenfield.Api/Greenfield.Api.csproj                            (create)
+backend/src/Api/Greenfield.Api/Program.cs                                       (create)
+backend/src/Api/Greenfield.Api/appsettings.json                                 (create)
+backend/src/Api/Greenfield.Api/appsettings.Development.json                     (create)
+backend/src/Api/Greenfield.Api/Properties/launchSettings.json                   (create)
+backend/src/Api/Greenfield.Api/Controllers/HealthCheckController.cs             (create)
+backend/src/Api/Greenfield.Api/Contracts/HealthCheckResponse.cs                 (create)
 
-backend/tests/Greenfield.UnitTests/Greenfield.UnitTests.csproj      (create)
-backend/tests/Greenfield.UnitTests/Controllers/HealthCheckControllerTests.cs (create)
-backend/tests/Greenfield.UnitTests/Services/SystemHealthCheckServiceTests.cs (create)
+backend/tests/Greenfield.Api.Tests/Greenfield.Api.Tests.csproj                  (create)
+backend/tests/Greenfield.Api.Tests/Controllers/HealthCheckControllerTests.cs    (create)
+backend/tests/Greenfield.Api.Tests/Endpoints/HealthCheckEndpointTests.cs        (create)
+backend/tests/Greenfield.Api.Tests/Services/SystemHealthCheckServiceTests.cs    (create)
 
-frontend/package.json                                               (create)
-frontend/angular.json                                               (create)
-frontend/tsconfig.json                                              (create)
-frontend/tsconfig.app.json                                          (create)
-frontend/tsconfig.spec.json                                         (create)
-frontend/src/index.html                                             (create)
-frontend/src/main.ts                                                (create)
-frontend/src/styles.css                                             (create)
-frontend/src/app/app.config.ts                                      (create)
-frontend/src/app/app.routes.ts                                      (create)
-frontend/src/app/app.component.ts                                   (create)
-frontend/src/app/app.component.html                                 (create)
-frontend/src/app/app.component.css                                  (create)
-frontend/src/app/app.component.spec.ts                              (create)
-frontend/src/app/core/models/health-status.model.ts                 (create)
-frontend/src/app/core/services/health-api.service.ts                (create)
-frontend/src/app/features/health/health-status.component.ts         (create)
-frontend/src/app/features/health/health-status.component.html       (create)
-frontend/src/app/features/health/health-status.component.css        (create)
-frontend/src/app/features/health/health-status.component.spec.ts    (create)
+frontend/package.json                                                           (create)
+frontend/angular.json                                                           (create)
+frontend/proxy.conf.json                                                        (create)
+frontend/tsconfig.json                                                          (create)
+frontend/tsconfig.app.json                                                      (create)
+frontend/tsconfig.spec.json                                                     (create)
+frontend/src/index.html                                                         (create)
+frontend/src/main.ts                                                            (create)
+frontend/src/styles.css                                                         (create)
+frontend/src/app/app.config.ts                                                  (create)
+frontend/src/app/app.component.ts                                               (create)
+frontend/src/app/app.component.html                                             (create)
+frontend/src/app/app.component.css                                              (create)
+frontend/src/app/app.component.spec.ts                                          (create)
+frontend/src/app/core/models/health-status.model.ts                             (create)
+frontend/src/app/core/services/health-api.service.ts                            (create)
+frontend/src/app/core/services/health-api.service.spec.ts                       (create)
+frontend/src/app/features/health/health-status.component.ts                     (create)
+frontend/src/app/features/health/health-status.component.html                   (create)
+frontend/src/app/features/health/health-status.component.css                    (create)
+frontend/src/app/features/health/health-status.component.spec.ts                (create)
 ```
 
 ## 3. Detailed implementation instructions per file
 
-### Root
+### Root files
 - `.gitignore`
-  - Ignore `backend/**/bin/`, `backend/**/obj/`, `frontend/node_modules/`, `frontend/dist/`, `frontend/.angular/`, `frontend/coverage/`.
-  - Pattern: repository-level ignore file; do not create nested Git repositories.
+  - Ignore `backend/**/bin/`, `backend/**/obj/`, `frontend/node_modules/`, `frontend/dist/`, `frontend/.angular/`, `frontend/coverage/`, IDE folders, and OS artifacts.
+  - Pattern: single repo-level ignore file only.
 
-### Backend solution and shared configuration
+- `global.json`
+  - Pin the .NET SDK to the .NET 10 SDK band used by the team, e.g. `10.0.100`.
+  - Pattern: reproducible SDK selection for local and CI builds.
+
+### Backend solution and shared build configuration
 - `backend/GreenfieldArchitecture.sln`
-  - Solution containing four projects in this order: Domain, Application, Infrastructure, Api, plus UnitTests.
-  - Ensure project references reflect Clean Architecture boundaries.
+  - Add all backend projects and the test project.
+  - Keep references aligned with Clean Architecture boundaries: Api -> Application + Infrastructure; Infrastructure -> Application; Application -> Domain.
 
 - `backend/Directory.Build.props`
-  - Centralize common MSBuild settings: `TargetFramework=net10.0`, `Nullable=enable`, `ImplicitUsings=enable`, `LangVersion=latest`, `TreatWarningsAsErrors=false`.
-  - Pattern: shared SDK configuration, not feature logic.
+  - Centralize shared build properties: `TargetFramework=net10.0`, `Nullable=enable`, `ImplicitUsings=enable`, `LangVersion=preview` or `latest`, `TreatWarningsAsErrors=true`, `EnableNETAnalyzers=true`, `AnalysisLevel=latest`.
+  - Pattern: enforce zero-warning builds to support AC-004.
 
 - `backend/Directory.Packages.props`
-  - Centralize package versions for test-only dependencies.
-  - Add exact versions from section 4.
-  - Pattern: Central Package Management.
+  - Enable Central Package Management.
+  - Declare exact versions from section 4.
+  - Pattern: one source of truth for backend package versions.
 
-### Backend Domain layer
+### Backend domain layer
 - `backend/src/Core/Greenfield.Domain/Greenfield.Domain.csproj`
-  - SDK-style class library with no external package references.
-  - Must not reference Application, Infrastructure, or Api.
+  - SDK-style class library with no external dependencies.
+  - Must not reference any other project.
 
 - `backend/src/Core/Greenfield.Domain/AssemblyReference.cs`
-  - Class name: `AssemblyReference`.
-  - No methods or properties; use as a minimal domain assembly marker.
-  - Pattern: future-proof Clean Architecture placeholder with zero framework coupling.
+  - Class: `AssemblyReference`.
+  - No members.
+  - Pattern: assembly marker for future domain scanning without introducing domain behavior now.
 
-### Backend Application layer
+### Backend application layer
 - `backend/src/Core/Greenfield.Application/Greenfield.Application.csproj`
   - SDK-style class library.
-  - Reference `Greenfield.Domain` only.
+  - Reference `Greenfield.Domain`.
+  - Add `Microsoft.Extensions.DependencyInjection.Abstractions` for the registration extension.
 
 - `backend/src/Core/Greenfield.Application/DependencyInjection.cs`
-  - Class name: `DependencyInjection`.
+  - Static class: `DependencyInjection`.
   - Method: `IServiceCollection AddApplication(this IServiceCollection services)`.
-  - Return the same `services` instance; keep the application composition root ready for future use cases.
-  - Pattern: layer-owned service registration extension.
+  - Return `services` unchanged for now.
+  - Pattern: layer-owned DI extension, no infrastructure knowledge.
 
-- `backend/src/Core/Greenfield.Application/Abstractions/Services/IHealthCheckService.cs`
-  - Interface name: `IHealthCheckService`.
+- `backend/src/Core/Greenfield.Application/Abstractions/Health/IHealthCheckService.cs`
+  - Interface: `IHealthCheckService`.
   - Method: `Task<HealthCheckResult> GetCurrentAsync(CancellationToken cancellationToken)`.
-  - Pattern: application abstraction; no ASP.NET types.
+  - Pattern: application abstraction; no ASP.NET Core types.
 
 - `backend/src/Core/Greenfield.Application/Health/HealthCheckResult.cs`
-  - Record name: `HealthCheckResult`.
-  - Properties: `string Status`, `string Environment`, `DateTimeOffset CheckedAtUtc`.
-  - Pattern: immutable application DTO.
+  - Record: `HealthCheckResult`.
+  - Properties: `string Status`, `string ApplicationName`, `string Environment`, `DateTimeOffset CheckedAtUtc`.
+  - Pattern: immutable application DTO returned by the use-case boundary.
 
-### Backend Infrastructure layer
+### Backend infrastructure layer
 - `backend/src/Infrastructure/Greenfield.Infrastructure/Greenfield.Infrastructure.csproj`
   - SDK-style class library.
   - Reference `Greenfield.Application`.
-  - No database packages in this phase.
+  - Add `Microsoft.Extensions.DependencyInjection.Abstractions` and `Microsoft.Extensions.Hosting.Abstractions`.
 
 - `backend/src/Infrastructure/Greenfield.Infrastructure/DependencyInjection.cs`
-  - Class name: `DependencyInjection`.
+  - Static class: `DependencyInjection`.
   - Method: `IServiceCollection AddInfrastructure(this IServiceCollection services)`.
-  - Register `TimeProvider.System` as singleton and `IHealthCheckService` -> `SystemHealthCheckService` as scoped.
-  - Pattern: infrastructure-only wiring.
+  - Register `TimeProvider.System` as singleton.
+  - Register `IHealthCheckService` to `SystemHealthCheckService` as scoped.
+  - Pattern: infrastructure composition only.
 
 - `backend/src/Infrastructure/Greenfield.Infrastructure/Services/SystemHealthCheckService.cs`
-  - Class name: `SystemHealthCheckService`.
+  - Class: `SystemHealthCheckService`.
   - Use a primary constructor: `(TimeProvider timeProvider, IHostEnvironment hostEnvironment)`.
   - Implement `IHealthCheckService`.
-  - Method: `GetCurrentAsync(CancellationToken cancellationToken)` returning a `HealthCheckResult` with a static healthy state, current environment name, and UTC timestamp from `timeProvider`.
-  - Pattern: infrastructure adapter; no controller logic here.
+  - `GetCurrentAsync` returns a healthy baseline payload using `hostEnvironment.ApplicationName`, `hostEnvironment.EnvironmentName`, and `timeProvider.GetUtcNow()`.
+  - Pattern: infrastructure adapter; keep all health payload creation here, not in the controller.
 
 ### Backend API layer
 - `backend/src/Api/Greenfield.Api/Greenfield.Api.csproj`
   - Use `Microsoft.NET.Sdk.Web`.
   - Reference `Greenfield.Application` and `Greenfield.Infrastructure`.
-  - No Swagger/OpenAPI packages in this phase.
+  - Do not add Swagger/OpenAPI packages in this initial slice.
 
 - `backend/src/Api/Greenfield.Api/Program.cs`
-  - Configure `builder.Services.AddControllers()`.
-  - Call `AddApplication()` and `AddInfrastructure()`.
-  - Build app, enable `UseHttpsRedirection()`, and call `MapControllers()`.
-  - Add `public partial class Program { }` at file end for future host-based testing extensibility.
+  - Use the standard host builder pattern: `var builder = WebApplication.CreateBuilder(args);`.
+  - Register `AddControllers()`, `AddApplication()`, and `AddInfrastructure()`.
+  - Build the app, call `UseHttpsRedirection()`, and `MapControllers()`.
+  - Add `public partial class Program { }` for `WebApplicationFactory` test support.
   - Pattern: composition root only; no endpoint logic in `Program.cs`.
 
 - `backend/src/Api/Greenfield.Api/appsettings.json`
-  - Minimal logging configuration and allowed hosts.
-  - No connection strings.
+  - Include minimal logging configuration and `AllowedHosts`.
+  - No connection strings or feature configuration.
 
 - `backend/src/Api/Greenfield.Api/appsettings.Development.json`
-  - Development-only logging overrides.
-  - Keep environment configuration minimal.
+  - Keep development logging slightly more verbose than production.
+  - No extra feature flags.
+
+- `backend/src/Api/Greenfield.Api/Properties/launchSettings.json`
+  - Define deterministic local HTTP/HTTPS ports for the API.
+  - Use those ports in the Angular proxy configuration.
+  - Pattern: consistent local developer startup.
 
 - `backend/src/Api/Greenfield.Api/Controllers/HealthCheckController.cs`
-  - Class name: `HealthCheckController`.
+  - Class: `HealthCheckController`.
   - Use a primary constructor: `(IHealthCheckService healthCheckService)`.
   - Inherit from `ControllerBase`.
-  - Attributes: `[ApiController]` and `[Route("api/health")]`.
-  - Method: `[HttpGet] Task<ActionResult<HealthCheckResponse>> Get(CancellationToken cancellationToken)`.
-  - Map `HealthCheckResult` to `HealthCheckResponse` and return `Ok(...)`.
-  - Pattern: thin controller, application abstraction injected directly, no business logic.
+  - Add `[ApiController]` and `[Route("api/health")]`.
+  - Add `[HttpGet]` method: `Task<ActionResult<HealthCheckResponse>> Get(CancellationToken cancellationToken)`.
+  - Map the application record to the API contract and return `Ok(...)`.
+  - Keep the controller thin: no direct clock access, no environment access, no inline business rules.
 
 - `backend/src/Api/Greenfield.Api/Contracts/HealthCheckResponse.cs`
-  - Record name: `HealthCheckResponse`.
-  - Properties: `string Status`, `string Environment`, `DateTimeOffset CheckedAtUtc`.
-  - Pattern: API contract isolated from internal application types.
+  - Record: `HealthCheckResponse`.
+  - Properties: `string Status`, `string ApplicationName`, `string Environment`, `DateTimeOffset CheckedAtUtc`.
+  - Pattern: API contract isolated from application types.
 
-### Backend tests
-- `backend/tests/Greenfield.UnitTests/Greenfield.UnitTests.csproj`
+### Backend automated tests
+- `backend/tests/Greenfield.Api.Tests/Greenfield.Api.Tests.csproj`
   - SDK-style test project.
   - Reference `Greenfield.Api`, `Greenfield.Application`, and `Greenfield.Infrastructure`.
-  - Add package references from `Directory.Packages.props`.
+  - Add `Microsoft.NET.Test.Sdk`, `xunit.v3`, `Moq`, and `Microsoft.AspNetCore.Mvc.Testing`.
   - Set `IsPackable=false`.
+  - Pattern: single xUnit project containing unit and lightweight integration tests.
 
-- `backend/tests/Greenfield.UnitTests/Controllers/HealthCheckControllerTests.cs`
-  - Test class name: `HealthCheckControllerTests`.
+- `backend/tests/Greenfield.Api.Tests/Controllers/HealthCheckControllerTests.cs`
+  - Test class: `HealthCheckControllerTests`.
   - Use `Moq` to mock `IHealthCheckService`.
-  - Test cases:
-    - `Get_ReturnsOkObjectResult`.
-    - `Get_MapsApplicationResult_ToApiContract`.
-    - `Get_PassesCancellationToken_ToService`.
-  - Pattern: isolated controller unit tests, no web host.
+  - Cover:
+    - `Get_returns_ok_result`.
+    - `Get_maps_application_result_to_api_contract`.
+    - `Get_passes_cancellation_token_to_service`.
+  - Pattern: isolated controller unit tests with no web host.
 
-- `backend/tests/Greenfield.UnitTests/Services/SystemHealthCheckServiceTests.cs`
-  - Test class name: `SystemHealthCheckServiceTests`.
-  - Use `Moq` to mock `TimeProvider` and `IHostEnvironment`.
-  - Test cases:
-    - `GetCurrentAsync_ReturnsHealthyStatus`.
-    - `GetCurrentAsync_UsesEnvironmentName_FromHostEnvironment`.
-    - `GetCurrentAsync_UsesUtcNow_FromTimeProvider`.
+- `backend/tests/Greenfield.Api.Tests/Endpoints/HealthCheckEndpointTests.cs`
+  - Test class: `HealthCheckEndpointTests`.
+  - Use `WebApplicationFactory<Program>`.
+  - Issue a real `GET /api/health` request.
+  - Assert HTTP 200, JSON shape, and presence of health metadata fields.
+  - Pattern: host-level integration test to satisfy the functional endpoint requirement.
+
+- `backend/tests/Greenfield.Api.Tests/Services/SystemHealthCheckServiceTests.cs`
+  - Test class: `SystemHealthCheckServiceTests`.
+  - Mock `TimeProvider` and `IHostEnvironment` with `Moq`.
+  - Cover:
+    - healthy status is always returned,
+    - application name is sourced from host environment,
+    - environment name is sourced from host environment,
+    - timestamp is sourced from `TimeProvider`.
   - Pattern: deterministic infrastructure unit tests.
 
-### Frontend workspace and configuration
+### Frontend workspace and toolchain
 - `frontend/package.json`
-  - Define scripts: `start`, `build`, `test`, `watch`.
-  - Include Angular runtime packages, CLI/build tooling, and Vitest/jsdom test tooling from section 4.
-  - Pattern: workspace-local toolchain; no global Angular CLI dependency assumed.
+  - Set `private: true`.
+  - Scripts:
+    - `start`: `ng serve --proxy-config proxy.conf.json`
+    - `build`: `ng build`
+    - `test`: `ng test`
+    - `watch`: `ng build --watch --configuration development`
+  - Include the Angular runtime and dev tooling from section 4.
+  - Pattern: self-contained workspace; no global CLI assumption.
 
 - `frontend/angular.json`
   - Configure one application project rooted at `src/`.
-  - Build target should output to `dist/frontend`.
-  - Test target must use `@angular/build:unit-test`.
-  - Pattern: standalone Angular workspace; no NgModule generation assumptions.
+  - Build target should use the application builder and output to `dist/frontend`.
+  - Test target must use `@angular/build:unit-test` with `runner: "vitest"`, `tsConfig: "tsconfig.spec.json"`, and a build target pointing to the development build.
+  - Serve target should reference `proxy.conf.json`.
+  - Pattern: standalone Angular workspace using the current build/test tooling.
+
+- `frontend/proxy.conf.json`
+  - Proxy `/api` to the backend local HTTP port from `launchSettings.json`.
+  - Pattern: avoid CORS setup for local development in this initial slice.
 
 - `frontend/tsconfig.json`
-  - Base TypeScript configuration with strict mode enabled.
-  - Keep path aliases out of scope for this phase.
+  - Enable `strict` TypeScript settings.
+  - Add Angular compiler strict template options.
+  - Pattern: fail fast on typing/template issues to support zero-warning, zero-error builds.
 
 - `frontend/tsconfig.app.json`
-  - App-specific compilation config for `src/main.ts` and application code.
+  - Include application source files and `src/main.ts`.
+  - Keep test files excluded.
 
 - `frontend/tsconfig.spec.json`
   - Include `src/**/*.spec.ts`.
   - Add test types for `vitest/globals` and `node`.
-  - Pattern: dedicated unit-test TypeScript config.
+  - Pattern: dedicated test TypeScript configuration as required by the Angular unit-test builder.
 
 - `frontend/src/index.html`
-  - Minimal host page with root element for Angular bootstrapping.
+  - Minimal host page with `<app-root></app-root>`.
 
 - `frontend/src/main.ts`
   - Bootstrap with `bootstrapApplication(AppComponent, appConfig)`.
   - No `NgModule` usage.
-  - Pattern: standalone bootstrap, per Angular current guidance.
+  - Pattern: standalone bootstrap per current Angular guidance.
 
 - `frontend/src/styles.css`
-  - Minimal global styles only; keep feature styling local.
+  - Keep global styling minimal.
+  - Do not move feature styling here.
 
 ### Frontend application shell
 - `frontend/src/app/app.config.ts`
-  - Export `appConfig` of type `ApplicationConfig`.
-  - Register `provideRouter(routes)` and `provideHttpClient()`.
-  - Pattern: provider configuration separated from component code.
-
-- `frontend/src/app/app.routes.ts`
-  - Export `routes: Routes`.
-  - Define a single default route that lazy-loads `HealthStatusComponent` with `loadComponent`.
-  - Pattern: standalone lazy route configuration.
+  - Export `appConfig: ApplicationConfig`.
+  - Register `provideHttpClient()` only.
+  - Do not configure router providers because routing is explicitly out of scope.
 
 - `frontend/src/app/app.component.ts`
-  - Component name: `AppComponent`.
+  - Component: `AppComponent`.
   - Set `standalone: true`.
-  - Import `RouterOutlet`.
-  - Keep class lightweight; shell only.
-  - Pattern: root shell component with no NgModule.
+  - Import `HealthStatusComponent`.
+  - Optionally use `ChangeDetectionStrategy.OnPush`.
+  - Pattern: root shell component composing one standalone feature component.
 
 - `frontend/src/app/app.component.html`
-  - Render application heading and `<router-outlet />`.
-  - Keep markup minimal.
+  - Render a simple page title and the health feature component.
 
 - `frontend/src/app/app.component.css`
-  - Minimal layout styling for the shell.
+  - Define shell spacing and max-width only.
 
 - `frontend/src/app/app.component.spec.ts`
-  - Test class/suite: `AppComponent` spec.
-  - Configure `TestBed` with `imports: [AppComponent]` and router providers.
-  - Test cases:
-    - component creates successfully,
-    - shell heading renders,
-    - router outlet host is present.
-  - Pattern: standalone component test using current Angular TestBed imports approach.
+  - Test suite: `AppComponent`.
+  - Configure `TestBed` with `imports: [AppComponent]` and `providers` from `appConfig`.
+  - Cover:
+    - component creation,
+    - shell title rendering,
+    - health component host appears in the DOM.
+  - Pattern: standalone component test using `imports` instead of declarations/NgModules.
 
 ### Frontend health feature
 - `frontend/src/app/core/models/health-status.model.ts`
-  - Interface name: `HealthStatus`.
-  - Properties: `status`, `environment`, `checkedAtUtc`.
-  - Pattern: frontend transport model matching API response.
+  - Interface: `HealthStatus`.
+  - Properties: `status`, `applicationName`, `environment`, `checkedAtUtc`.
+  - Use `checkedAtUtc: string` because the API serializes an ISO timestamp.
 
 - `frontend/src/app/core/services/health-api.service.ts`
-  - Service name: `HealthApiService`.
+  - Service: `HealthApiService`.
   - Use `inject(HttpClient)` instead of constructor injection.
-  - Method: `getHealthStatus()` returning `Observable<HealthStatus>` from `GET /api/health`.
-  - Pattern: thin HTTP service; no state stored here.
+  - Method: `getHealthStatus(): Observable<HealthStatus>` calling `GET /api/health`.
+  - Pattern: thin transport service; no state and no presentation logic.
+
+- `frontend/src/app/core/services/health-api.service.spec.ts`
+  - Test suite: `HealthApiService`.
+  - Use Angular HTTP testing providers.
+  - Cover:
+    - correct request method/path (`GET /api/health`),
+    - response is deserialized into the `HealthStatus` shape.
+  - Pattern: HTTP boundary test independent of UI logic.
 
 - `frontend/src/app/features/health/health-status.component.ts`
-  - Component name: `HealthStatusComponent`.
+  - Component: `HealthStatusComponent`.
   - Set `standalone: true`.
-  - Use signals for reactive state: `isLoading`, `health`, `errorMessage`.
-  - Add a `computed` property such as `statusLabel` for display text.
-  - Method: `runHealthCheck()` that flips loading state, calls `HealthApiService`, updates signals on success/error.
-  - Pattern: standalone feature component with local signal-based state; no NgModule.
+  - Imports should include the Angular directives/pipes needed by the template only.
+  - Use Signals for state:
+    - `isLoading = signal(false)`
+    - `health = signal<HealthStatus | null>(null)`
+    - `errorMessage = signal<string | null>(null)`
+  - Add at least one computed signal, e.g. `statusLabel` or `hasHealthData`.
+  - Method: `runHealthCheck()` that resets errors, sets loading state, calls `HealthApiService`, updates signals on success, and clears loading in both success and error paths.
+  - Pattern: local component state with Signals, no NgModule, no store library.
 
 - `frontend/src/app/features/health/health-status.component.html`
-  - Render current signal-driven state.
-  - Include a button to invoke `runHealthCheck()`.
-  - Show status details when available and error feedback when applicable.
+  - Render:
+    - a button to trigger/refresh the health check,
+    - a loading state,
+    - a success card showing status, application name, environment, and timestamp,
+    - an error state if the call fails.
+  - Use current Angular control flow syntax if desired, but keep it simple and readable.
 
 - `frontend/src/app/features/health/health-status.component.css`
-  - Local styling only for card/layout/status states.
+  - Local styles for the health card, state colors, and button spacing.
 
 - `frontend/src/app/features/health/health-status.component.spec.ts`
-  - Test suite: `HealthStatusComponent` spec.
-  - Configure `TestBed` with `imports: [HealthStatusComponent]` and a mocked `HealthApiService`.
-  - Test cases:
-    - initial idle state renders,
-    - successful service response updates signals and DOM,
-    - failed service response shows error state,
-    - button disables or reflects loading state while request is in progress.
-  - Pattern: component-first testing for signal state transitions.
+  - Test suite: `HealthStatusComponent`.
+  - Provide a mocked `HealthApiService`.
+  - Cover:
+    - initial idle state,
+    - loading state while request is unresolved,
+    - success state updates signals and DOM,
+    - error state renders when the service fails,
+    - refresh button triggers `runHealthCheck()`.
+  - Pattern: component-first signal testing using standalone `imports` in `TestBed`.
 
 ## 4. Dependencies
 
 ### Backend NuGet packages
-Use Central Package Management in `backend/Directory.Packages.props`.
+Declare these in `backend/Directory.Packages.props`.
 
-- `Microsoft.NET.Test.Sdk` - `17.13.0`
-- `xunit.v3` - `2.0.3`
-- `xunit.runner.visualstudio` - `3.1.1`
-- `Moq` - `4.20.72`
+**Production / shared abstractions**
+- `Microsoft.Extensions.DependencyInjection.Abstractions` — `10.0.0`
+- `Microsoft.Extensions.Hosting.Abstractions` — `10.0.0`
 
-### Backend shared framework
-No extra runtime NuGet packages are required for the production API in this phase.
-Use the .NET 10 shared framework via `Microsoft.NET.Sdk.Web` and `net10.0`.
+**Testing**
+- `Microsoft.NET.Test.Sdk` — `17.13.0`
+- `xunit.v3` — `3.0.1`
+- `Moq` — `4.20.72`
+- `Microsoft.AspNetCore.Mvc.Testing` — `10.0.1`
+
+**Framework references**
+- API project uses `Microsoft.NET.Sdk.Web` targeting `net10.0`.
+- No database, authentication, or Swagger packages in this phase.
 
 ### Frontend npm packages
-`dependencies`
+Use Angular 20-compatible package versions consistently across Angular packages.
+
+**dependencies**
 - `@angular/common`
 - `@angular/compiler`
 - `@angular/core`
 - `@angular/platform-browser`
-- `@angular/router`
 - `rxjs`
 - `tslib`
 - `zone.js`
 
-`devDependencies`
+**devDependencies**
 - `@angular/build`
 - `@angular/cli`
 - `@angular/compiler-cli`
@@ -333,45 +386,66 @@ Use the .NET 10 shared framework via `Microsoft.NET.Sdk.Web` and `net10.0`.
 
 ## 5. Automated tests
 
-### .NET test files
-- `backend/tests/Greenfield.UnitTests/Controllers/HealthCheckControllerTests.cs`
-- `backend/tests/Greenfield.UnitTests/Services/SystemHealthCheckServiceTests.cs`
-
-### Angular test files
+### Test files to create
+- `backend/tests/Greenfield.Api.Tests/Controllers/HealthCheckControllerTests.cs`
+- `backend/tests/Greenfield.Api.Tests/Endpoints/HealthCheckEndpointTests.cs`
+- `backend/tests/Greenfield.Api.Tests/Services/SystemHealthCheckServiceTests.cs`
 - `frontend/src/app/app.component.spec.ts`
+- `frontend/src/app/core/services/health-api.service.spec.ts`
 - `frontend/src/app/features/health/health-status.component.spec.ts`
 
-### What the implementation developer must test
-- Backend controller returns HTTP 200 for `GET /api/health`.
-- Backend controller maps the application result to the API contract without leaking internal types.
-- Backend controller passes the received cancellation token to the application service.
-- Infrastructure health service always returns a healthy baseline payload with deterministic environment and timestamp values under test.
-- Angular root shell bootstraps as a standalone component and renders without NgModules.
-- Angular health component uses signals to drive UI state transitions.
-- Angular health component correctly renders success and error states based on the mocked API service.
-- `dotnet test backend/GreenfieldArchitecture.sln` and `npm test` must both pass.
+### Backend test expectations
+- `HealthCheckControllerTests.cs`
+  - Verify `GET` action returns `OkObjectResult` / `ActionResult<HealthCheckResponse>`.
+  - Verify application result is mapped exactly to API contract fields.
+  - Verify the incoming `CancellationToken` is forwarded to `IHealthCheckService`.
+
+- `HealthCheckEndpointTests.cs`
+  - Verify the hosted API returns `200 OK` for `GET /api/health`.
+  - Verify JSON contains `status`, `applicationName`, `environment`, and `checkedAtUtc`.
+  - Verify the returned `status` is the expected healthy value.
+
+- `SystemHealthCheckServiceTests.cs`
+  - Verify healthy baseline response.
+  - Verify environment and application name are sourced from `IHostEnvironment`.
+  - Verify timestamp uses the injected `TimeProvider` value, not `DateTimeOffset.UtcNow` directly.
+
+### Frontend test expectations
+- `app.component.spec.ts`
+  - Verify the standalone root component renders.
+  - Verify the page title appears.
+  - Verify the health feature component is composed by the shell.
+
+- `health-api.service.spec.ts`
+  - Verify the service issues `GET /api/health`.
+  - Verify response mapping matches the frontend model.
+
+- `health-status.component.spec.ts`
+  - Verify the component starts in a non-loading idle state.
+  - Verify clicking the button triggers the API call.
+  - Verify unresolved requests show loading UI.
+  - Verify successful responses populate the DOM from Signals.
+  - Verify failed responses show an error message and clear loading state.
+
+### Validation commands the implementation developer must pass
+- `dotnet build backend/GreenfieldArchitecture.sln`
+- `dotnet test backend/GreenfieldArchitecture.sln`
+- `npm install` in `frontend/`
+- `npm run build` in `frontend/`
+- `npm test` in `frontend/`
 
 ## 6. Acceptance criteria
-- **AC-001:** A .NET 10 Web API project exists in `/backend`.
-  - Fulfilled by `backend/GreenfieldArchitecture.sln` and `backend/src/Api/Greenfield.Api/Greenfield.Api.csproj`, targeting `net10.0` and buildable via `dotnet build backend`.
+- **AC-001: Backend .NET 10 Web API structure established**
+  - Fulfilled by creating `backend/GreenfieldArchitecture.sln`, the `Greenfield.Api` Web API project, and the supporting Clean Architecture projects under `backend/src/`.
 
-- **AC-002:** Backend API includes a HealthCheck controller that responds to GET requests.
-  - Fulfilled by `backend/src/Api/Greenfield.Api/Controllers/HealthCheckController.cs` exposing `[HttpGet]` on `api/health`.
+- **AC-002: HealthCheck controller implemented with Primary Constructors**
+  - Fulfilled by `backend/src/Api/Greenfield.Api/Controllers/HealthCheckController.cs`, which uses a primary constructor and exposes `GET /api/health`, backed by `SystemHealthCheckService` using a primary constructor as well.
 
-- **AC-003:** HealthCheck controller uses Primary Constructors.
-  - Fulfilled by declaring `HealthCheckController(IHealthCheckService healthCheckService) : ControllerBase`.
+- **AC-003: Angular 18+ frontend with Standalone Components and Signals**
+  - Fulfilled by `frontend/src/main.ts` using `bootstrapApplication`, `AppComponent` and `HealthStatusComponent` both being standalone, and `HealthStatusComponent` storing UI state in Signals/computed signals.
 
-- **AC-004:** An Angular 18+ application with Standalone Components exists in `/frontend`.
-  - Fulfilled by `frontend/angular.json`, `frontend/package.json`, and `frontend/src/main.ts` bootstrapping a standalone app.
+- **AC-004: Zero compilation errors for both backend and frontend**
+  - Fulfilled by strict build configuration (`TreatWarningsAsErrors`, strict TypeScript/Angular compiler settings) and by the validation commands listed in section 5 passing cleanly.
 
-- **AC-005:** Frontend uses Standalone Components with no NgModule required for the root app.
-  - Fulfilled by `AppComponent` and `HealthStatusComponent` both using `standalone: true`, with `bootstrapApplication` in `main.ts`.
-
-- **AC-006:** Frontend uses Angular Signals for reactive state management.
-  - Fulfilled by `HealthStatusComponent` implementing signal-backed state (`isLoading`, `health`, `errorMessage`) and a computed display value.
-
-- **AC-007:** Both backend and frontend projects compile without errors.
-  - Fulfilled when `dotnet build backend/GreenfieldArchitecture.sln` and `npm run build` in `frontend/` both succeed.
-
-- **AC-008:** Changes are pushed to a new feature branch in the origin repository.
-  - Fulfilled operationally by creating `feature/INIT-001-greenfield`, committing the scaffold, and pushing with upstream tracking after local build/test success.
+- **AC-005: Feature branch created and pushed to origin**
+  - Fulfilled operationally after implementation by creating `feature/INIT-001-greenfield`, committing the scaffold, and pushing it to `origin` once the backend/frontend build and test commands succeed.
