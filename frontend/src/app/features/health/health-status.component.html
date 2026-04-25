@@ -1,0 +1,26 @@
+<section class="health-card">
+  <button class="health-card__btn" (click)="runHealthCheck()" [disabled]="isLoading()">
+    @if (isLoading()) {
+      Checking…
+    } @else {
+      Run Health Check
+    }
+  </button>
+
+  @if (isLoading()) {
+    <p class="health-card__loading" role="status">Loading health status…</p>
+  }
+
+  @if (hasHealthData() && !isLoading()) {
+    <div class="health-card__result">
+      <p><strong>Status:</strong> <span class="health-card__status">{{ health()!.status }}</span></p>
+      <p><strong>Application:</strong> {{ health()!.applicationName }}</p>
+      <p><strong>Environment:</strong> {{ health()!.environment }}</p>
+      <p><strong>Checked at:</strong> {{ health()!.checkedAtUtc }}</p>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <p class="health-card__error" role="alert">{{ errorMessage() }}</p>
+  }
+</section>

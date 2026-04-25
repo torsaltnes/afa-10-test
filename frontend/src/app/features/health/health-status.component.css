@@ -1,0 +1,41 @@
+.health-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.health-card__btn {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #1976d2;
+  color: #fff;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.health-card__btn:disabled {
+  background-color: #90caf9;
+  cursor: not-allowed;
+}
+
+.health-card__loading {
+  color: #555;
+  font-style: italic;
+}
+
+.health-card__result {
+  line-height: 1.8;
+}
+
+.health-card__status {
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.health-card__error {
+  color: #c62828;
+  font-weight: 500;
+}
