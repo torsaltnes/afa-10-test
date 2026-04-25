@@ -5,7 +5,8 @@
   "scripts": {
     "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
-    "test": "ng test",
+    "test": "node run-tests.mjs",
+    "lint": "tsc --noEmit -p tsconfig.app.json",
     "watch": "ng build --watch --configuration development"
   },
   "dependencies": {
