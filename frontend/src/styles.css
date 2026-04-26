@@ -9,8 +9,9 @@
   --color-primary-hover: oklch(0.546 0.245 262);   /* ≈ blue-600  */
 
   /* Surfaces */
-  --color-surface:      oklch(1 0 0);              /* white        */
-  --color-surface-dark: oklch(0.279 0.041 256);    /* ≈ slate-800  */
+  --color-surface:       oklch(1 0 0);             /* white        */
+  --color-surface-dark:  oklch(0.279 0.041 256);   /* ≈ slate-800  */
+  --color-surface-muted: oklch(0.968 0.007 247);   /* ≈ gray-50    */
 
   /* Semantic feedback */
   --color-success: oklch(0.723 0.190 147);         /* ≈ green-500  */
@@ -23,6 +24,7 @@
 
   /* Layout helpers — exposed as Tailwind spacing/radius utilities */
   --spacing-section: 2rem;
+  --spacing-panel:   1.5rem;
   --radius-card:     0.75rem;
 }
 
@@ -37,5 +39,28 @@
 
     /* Enable native dark-mode scrollbar tinting in supporting browsers */
     color-scheme: light dark;
+  }
+}
+
+@layer components {
+  /**
+   * Custom chevron arrow for native <select> elements.
+   * Apply alongside `appearance-none` — the padding-right leaves room for the
+   * arrow so text is never obscured. Pair with Tailwind border/bg utilities.
+   */
+  .field-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.625rem center;
+    background-repeat: no-repeat;
+    background-size: 1.125rem;
+    padding-right: 2.25rem;
+  }
+}
+
+/* Dark-mode arrow uses a lighter stroke so it's visible on dark surfaces */
+@media (prefers-color-scheme: dark) {
+  .field-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath stroke='%239ca3af' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
   }
 }

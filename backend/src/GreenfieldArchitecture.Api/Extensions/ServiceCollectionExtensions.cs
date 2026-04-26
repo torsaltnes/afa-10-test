@@ -1,5 +1,8 @@
+using GreenfieldArchitecture.Application.Abstractions.Deviations;
 using GreenfieldArchitecture.Application.Abstractions.Health;
+using GreenfieldArchitecture.Application.Deviations.Services;
 using GreenfieldArchitecture.Application.Health.Services;
+using GreenfieldArchitecture.Infrastructure.Deviations;
 using GreenfieldArchitecture.Infrastructure.Health;
 using System.Reflection;
 
@@ -15,8 +18,17 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration,
         IHostEnvironment environment)
     {
+        // ── CORS ──────────────────────────────────────────────────────────────
+        services.AddCors(options =>
+            options.AddDefaultPolicy(policy => policy
+                .WithOrigins("http://localhost:4200", "https://localhost:4200")
+                .AllowAnyHeader()
+                .AllowAnyMethod()));
+
+        // ── Infrastructure ────────────────────────────────────────────────────
         services.AddSingleton(TimeProvider.System);
 
+        // ── Health ────────────────────────────────────────────────────────────
         services.AddScoped<IHealthService, HealthService>();
 
         services.AddSingleton<IApplicationMetadataProvider>(sp =>
@@ -36,6 +48,10 @@ public static class ServiceCollectionExtensions
 
             return new ApplicationMetadataProvider(serviceName, version, environmentName);
         });
+
+        // ── Deviations ────────────────────────────────────────────────────────
+        services.AddSingleton<IDeviationRepository, InMemoryDeviationRepository>();
+        services.AddScoped<IDeviationService, DeviationService>();
 
         return services;
     }

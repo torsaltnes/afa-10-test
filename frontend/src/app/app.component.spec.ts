@@ -21,7 +21,8 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('header')).not.toBeNull();
-    expect(compiled.querySelector('header')?.textContent).toContain('Greenfield Architecture');
+    // The header contains the brand name (may be split across responsive spans)
+    expect(compiled.querySelector('header')?.textContent).toContain('Greenfield');
   });
 
   it('should contain a router-outlet element', () => {
@@ -29,5 +30,23 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('router-outlet')).not.toBeNull();
+  });
+
+  it('should render a Deviations navigation link', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const links = compiled.querySelectorAll('nav a');
+    const linkTexts = Array.from(links).map((a) => a.textContent?.trim());
+    expect(linkTexts).toContain('Deviations');
+  });
+
+  it('should render a Health navigation link', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const links = compiled.querySelectorAll('nav a');
+    const linkTexts = Array.from(links).map((a) => a.textContent?.trim());
+    expect(linkTexts).toContain('Health');
   });
 });
