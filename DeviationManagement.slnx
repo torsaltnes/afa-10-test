@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/backend/" />
+  <Folder Name="/backend/src/">
+    <Project Path="backend/src/DeviationManagement.Api/DeviationManagement.Api.csproj" />
+    <Project Path="backend/src/DeviationManagement.Application/DeviationManagement.Application.csproj" />
+    <Project Path="backend/src/DeviationManagement.Domain/DeviationManagement.Domain.csproj" />
+    <Project Path="backend/src/DeviationManagement.Infrastructure/DeviationManagement.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/backend/tests/">
+    <Project Path="backend/tests/DeviationManagement.UnitTests/DeviationManagement.UnitTests.csproj" />
+  </Folder>
+</Solution>

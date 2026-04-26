@@ -16,4 +16,7 @@ frontend/coverage/
 # IDE
 .idea/
 .vscode/
+
+# OS artifacts
 *.DS_Store
+Thumbs.db

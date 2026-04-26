@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Greenfield.Api</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Greenfield.Application\Greenfield.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Greenfield.Infrastructure\Greenfield.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

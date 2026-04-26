@@ -1,0 +1,120 @@
+<div class="page-container max-w-2xl">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">
+      {{ isEditMode ? 'Edit Deviation' : 'New Deviation' }}
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">
+      {{ isEditMode ? 'Update the deviation details below.' : 'Fill in the details to create a new deviation.' }}
+    </p>
+  </div>
+
+  <!-- Error from store -->
+  @if (store.error()) {
+    <div class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+      {{ store.error() }}
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="card space-y-5" novalidate>
+
+    <!-- Title -->
+    <div>
+      <label for="title" class="form-label">Title <span class="text-red-500">*</span></label>
+      <input
+        id="title"
+        type="text"
+        formControlName="title"
+        class="form-input"
+        [class.invalid]="form.get('title')?.invalid && form.get('title')?.touched"
+        placeholder="Brief description of the deviation"
+      />
+      @if (form.get('title')?.invalid && form.get('title')?.touched) {
+        <p class="form-error">
+          @if (form.get('title')?.errors?.['required']) { Title is required. }
+          @if (form.get('title')?.errors?.['maxlength']) { Title must not exceed 200 characters. }
+        </p>
+      }
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label for="description" class="form-label">Description</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        class="form-input"
+        [class.invalid]="form.get('description')?.invalid && form.get('description')?.touched"
+        rows="3"
+        placeholder="Detailed description…"
+      ></textarea>
+      @if (form.get('description')?.invalid && form.get('description')?.touched) {
+        <p class="form-error">Description must not exceed 2000 characters.</p>
+      }
+    </div>
+
+    <!-- Severity + Status row -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label for="severity" class="form-label">Severity <span class="text-red-500">*</span></label>
+        <select id="severity" formControlName="severity" class="form-input">
+          @for (s of severities; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="status" class="form-label">Status <span class="text-red-500">*</span></label>
+        <select id="status" formControlName="status" class="form-input">
+          @for (s of statuses; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Reported By -->
+    <div>
+      <label for="reportedBy" class="form-label">Reported By <span class="text-red-500">*</span></label>
+      <input
+        id="reportedBy"
+        type="text"
+        formControlName="reportedBy"
+        class="form-input"
+        [class.invalid]="form.get('reportedBy')?.invalid && form.get('reportedBy')?.touched"
+        placeholder="Name of reporter"
+      />
+      @if (form.get('reportedBy')?.invalid && form.get('reportedBy')?.touched) {
+        <p class="form-error">
+          @if (form.get('reportedBy')?.errors?.['required']) { Reported By is required. }
+          @if (form.get('reportedBy')?.errors?.['maxlength']) { Reported By must not exceed 100 characters. }
+        </p>
+      }
+    </div>
+
+    <!-- Occurred At -->
+    <div>
+      <label for="occurredAt" class="form-label">Occurred At <span class="text-red-500">*</span></label>
+      <input
+        id="occurredAt"
+        type="date"
+        formControlName="occurredAt"
+        class="form-input"
+        [class.invalid]="form.get('occurredAt')?.invalid && form.get('occurredAt')?.touched"
+      />
+      @if (form.get('occurredAt')?.invalid && form.get('occurredAt')?.touched) {
+        <p class="form-error">Occurred At is required.</p>
+      }
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <button type="button" (click)="cancel()" class="btn-secondary">
+        Cancel
+      </button>
+      <button type="submit" class="btn-primary" [disabled]="store.saving()">
+        {{ store.saving() ? 'Saving…' : (isEditMode ? 'Update' : 'Create') }}
+      </button>
+    </div>
+  </form>
+</div>
