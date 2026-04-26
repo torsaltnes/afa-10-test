@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <AssemblyName>GreenfieldArchitecture.Api</AssemblyName>
+    <RootNamespace>GreenfieldArchitecture.Api</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GreenfieldArchitecture.Application\GreenfieldArchitecture.Application.csproj" />
+    <ProjectReference Include="..\GreenfieldArchitecture.Infrastructure\GreenfieldArchitecture.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
+</Project>

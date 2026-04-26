@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>GreenfieldArchitecture.Application</AssemblyName>
+    <RootNamespace>GreenfieldArchitecture.Application</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GreenfieldArchitecture.Domain\GreenfieldArchitecture.Domain.csproj" />
+  </ItemGroup>
+</Project>
