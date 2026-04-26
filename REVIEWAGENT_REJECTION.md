@@ -1,19 +1,22 @@
 # ❌ ReviewAgent Rejection Report
 
 **Task:** FEAT-002 – Deviation / Non-conformity management feature
-**Timestamp:** 2026-04-25 23:58:11Z
+**Timestamp:** 2026-04-26 00:13:42Z
 
 ---
 
 ## Rejection Reason
 
 ## REJECTION SUMMARY
-- Unauthenticated CRUD exposes all deviations
-- No object-level authorization or ownership checks
+- Hardcoded JWT signing key enables token forgery
+- Missing subject-claim enforcement weakens ownership checks
+- Frontend build chain has known moderate vulnerabilities
 
-The API in `backend/src/DeviationManagement.Api` has no authentication/authorization pipeline (`AddAuthentication`, `UseAuthentication`, `UseAuthorization` are absent), and `DeviationsController` exposes full read/write/delete access without `[Authorize]` or any per-record ownership checks. That creates an OWASP-style authorization flaw/IDOR risk: any caller with network access can enumerate, modify, or delete every deviation by ID.
+The backend commits a symmetric JWT secret in `backend/src/DeviationManagement.Api/appsettings.json` and `appsettings.Development.json`, and `Program.cs` uses it directly for bearer validation. Anyone with repository access can mint valid tokens and bypass authentication entirely. That is a critical auth-bypass issue.
 
-I also verified the UI is using Angular interpolation, so output-encoding looks acceptable, and server-side field validation is present. However, the missing authorization boundary is a critical security gap and blocks approval.
+The controller/service layer also falls back to `string.Empty` when the `sub`/`NameIdentifier` claim is missing. Ownership checks then rely on an empty identifier instead of rejecting the request, which weakens object-level authorization and can create IDOR-style exposure under misconfigured or nonstandard tokens.
+
+Separately, dependency audit found moderate issues in the frontend build chain (`postcss`, `uuid`, Angular dev tooling). These are not the primary rejection reason, but they should be remediated.
 
 REJECTED
 

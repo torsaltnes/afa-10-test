@@ -14,6 +14,12 @@ public sealed class DeviationsApiIntegrationTests : IClassFixture<WebApplication
 {
     private readonly WebApplicationFactory<Program> _factory;
 
+    /// <summary>
+    /// A test-only JWT key long enough to pass the startup length check.
+    /// It is never used to mint real tokens — auth is replaced by TestAuthHandler.
+    /// </summary>
+    private const string TestJwtKey = "integration-test-only-jwt-signing-key-not-for-production!!";
+
     private static readonly JsonSerializerOptions JsonOpts = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -24,6 +30,9 @@ public sealed class DeviationsApiIntegrationTests : IClassFixture<WebApplication
     {
         _factory = factory.WithWebHostBuilder(builder =>
         {
+            // ── Supply a dummy JWT key so the startup guard doesn't throw ──
+            builder.UseSetting("Jwt:Key", TestJwtKey);
+
             builder.ConfigureServices(services =>
             {
                 // ── Replace in-memory store so each test-class instance gets a fresh store ──
@@ -115,19 +124,14 @@ public sealed class DeviationsApiIntegrationTests : IClassFixture<WebApplication
     [Fact]
     public async Task GetAll_WithoutAuthentication_Returns401()
     {
-        // Use the raw factory (without TestAuthHandler) to test auth enforcement
-        var unauthenticatedClient = _factory.CreateClient();
-
-        // Build a factory without the test auth override
+        // Build a vanilla factory (no TestAuthHandler) that still has a valid JWT key
+        // so the startup guard passes — then send a request with no bearer token.
         var vanillaFactory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
         {
-            builder.ConfigureServices(services =>
-            {
-                // no auth override — JWT Bearer is required
-            });
+            builder.UseSetting("Jwt:Key", TestJwtKey);
+            // No auth scheme override — JWT Bearer is required
         });
 
-        // Craft a request with no Authorization header
         var client = vanillaFactory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false

@@ -38,6 +38,19 @@ public sealed class DeviationsControllerTests
         };
     }
 
+    /// <summary>Creates a controller whose principal has NO sub/NameIdentifier claim.</summary>
+    private DeviationsController CreateSutWithoutSubClaim()
+    {
+        var sut = new DeviationsController(_serviceMock.Object);
+        var claims = new[] { new Claim(ClaimTypes.Name, "No Sub User") };
+        var identity = new ClaimsIdentity(claims, "TestScheme");
+        sut.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = new ClaimsPrincipal(identity) }
+        };
+        return sut;
+    }
+
     private static DeviationDto BuildDto(Guid? id = null) => new(
         id ?? Guid.NewGuid(),
         "Title",
@@ -82,6 +95,17 @@ public sealed class DeviationsControllerTests
         _serviceMock.Verify(s => s.GetAllAsync(TestOwnerId, It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    [Fact]
+    public async Task GetAll_MissingSubClaim_ReturnsUnauthorized_AndDoesNotCallService()
+    {
+        var sut = CreateSutWithoutSubClaim();
+
+        var result = await sut.GetAll(CancellationToken.None);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+        _serviceMock.Verify(s => s.GetAllAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     // ─── GET /api/deviations/{id} ─────────────────────────────────────────────
 
     [Fact]
@@ -107,6 +131,19 @@ public sealed class DeviationsControllerTests
         var notFound = Assert.IsType<NotFoundObjectResult>(result);
         var problem = Assert.IsType<ProblemDetails>(notFound.Value);
         Assert.Equal(404, problem.Status);
+    }
+
+    [Fact]
+    public async Task GetById_MissingSubClaim_ReturnsUnauthorized_AndDoesNotCallService()
+    {
+        var sut = CreateSutWithoutSubClaim();
+
+        var result = await sut.GetById(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+        _serviceMock.Verify(
+            s => s.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 
     // ─── POST /api/deviations ─────────────────────────────────────────────────
@@ -139,6 +176,19 @@ public sealed class DeviationsControllerTests
         var objResult = Assert.IsAssignableFrom<ObjectResult>(result);
         Assert.Equal(400, objResult.StatusCode);
         Assert.IsType<ValidationProblemDetails>(objResult.Value);
+    }
+
+    [Fact]
+    public async Task Create_MissingSubClaim_ReturnsUnauthorized_AndDoesNotCallService()
+    {
+        var sut = CreateSutWithoutSubClaim();
+
+        var result = await sut.Create(ValidApiRequest(), CancellationToken.None);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+        _serviceMock.Verify(
+            s => s.CreateAsync(It.IsAny<SaveDeviationRequest>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 
     // ─── PUT /api/deviations/{id} ─────────────────────────────────────────────
@@ -200,6 +250,21 @@ public sealed class DeviationsControllerTests
         Assert.IsType<ValidationProblemDetails>(objResult.Value);
     }
 
+    [Fact]
+    public async Task Update_MissingSubClaim_ReturnsUnauthorized_AndDoesNotCallService()
+    {
+        var sut = CreateSutWithoutSubClaim();
+
+        var result = await sut.Update(Guid.NewGuid(), ValidApiRequest(), CancellationToken.None);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+        _serviceMock.Verify(
+            s => s.UpdateAsync(
+                It.IsAny<Guid>(), It.IsAny<SaveDeviationRequest>(),
+                It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
     // ─── DELETE /api/deviations/{id} ──────────────────────────────────────────
 
     [Fact]
@@ -239,5 +304,18 @@ public sealed class DeviationsControllerTests
         Assert.Equal(403, objResult.StatusCode);
         var problem = Assert.IsType<ProblemDetails>(objResult.Value);
         Assert.Equal(403, problem.Status);
+    }
+
+    [Fact]
+    public async Task Delete_MissingSubClaim_ReturnsUnauthorized_AndDoesNotCallService()
+    {
+        var sut = CreateSutWithoutSubClaim();
+
+        var result = await sut.Delete(Guid.NewGuid(), CancellationToken.None);
+
+        Assert.IsType<UnauthorizedObjectResult>(result);
+        _serviceMock.Verify(
+            s => s.DeleteAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
     }
 }
