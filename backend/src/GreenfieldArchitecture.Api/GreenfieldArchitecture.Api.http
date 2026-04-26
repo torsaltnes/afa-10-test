@@ -1,0 +1,11 @@
+@baseUrl = https://localhost:7250
+
+### Get health status (application health endpoint)
+GET {{baseUrl}}/api/health
+Accept: application/json
+
+###
+
+### Get liveness check (infrastructure health check)
+GET {{baseUrl}}/health/live
+Accept: application/json

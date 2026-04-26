@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>GreenfieldArchitecture.Infrastructure</AssemblyName>
+    <RootNamespace>GreenfieldArchitecture.Infrastructure</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GreenfieldArchitecture.Application\GreenfieldArchitecture.Application.csproj" />
+    <ProjectReference Include="..\GreenfieldArchitecture.Domain\GreenfieldArchitecture.Domain.csproj" />
+  </ItemGroup>
+</Project>
