@@ -3,27 +3,34 @@ import { inject } from '@angular/core';
 import { IdentityService } from '../services/identity.service';
 
 /**
- * HTTP interceptor that attaches the current employee's identity as the
- * `X-Employee-Id` request header on every outgoing API call.
+ * HTTP interceptor that attaches the current session's Bearer token as the
+ * standard `Authorization` header on every outgoing API call.
  *
- * The backend's `RequireUserIdentityFilter` uses this header to:
- *   1. Authenticate the caller (OWASP A01 gate).
- *   2. Scope profile data to the correct employee (IDOR prevention).
+ * Security model
+ * ──────────────
+ * The token is an opaque server-side secret managed by `IdentityService`.
+ * The backend's `DevApiKeyAuthHandler` validates it against a server-owned
+ * token→employeeId map so that identity is resolved server-side, not from a
+ * user-controllable value (OWASP A01 / IDOR prevention).
  *
- * When real auth (JWT/OIDC) is introduced, replace this interceptor with one
- * that attaches a `Bearer` token; the backend already prefers
- * `HttpContext.User.Identity.Name` from claims over the header.
+ * The previous implementation sent an `X-Employee-Id` header whose value the
+ * client chose directly — any caller could impersonate any employee by setting
+ * an arbitrary header.  This interceptor no longer does that.
+ *
+ * Migration path: when real auth (JWT/OIDC) is introduced, replace
+ * `IdentityService.token` with the JWT access token obtained after login;
+ * the `Authorization: Bearer` format is already the correct standard.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const identity = inject(IdentityService);
-  const employeeId = identity.employeeId();
+  const token = identity.token();
 
-  if (!employeeId) {
+  if (!token) {
     return next(req);
   }
 
   const authedReq = req.clone({
-    setHeaders: { 'X-Employee-Id': employeeId },
+    setHeaders: { Authorization: `Bearer ${token}` },
   });
 
   return next(authedReq);

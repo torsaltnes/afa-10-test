@@ -70,3 +70,36 @@ Verified the workspace builds and tests cleanly: backend solution build passed, 
 
 ---
 
+## [ReviewAgent] 2026-04-27 16:01:40 UTC
+
+Rejected because the profile feature treats the X-Employee-Id header as an authentication source. Without any authentication/authorization middleware, any client can impersonate another employee by sending an arbitrary header value, which creates an OWASP A01/IDOR exposure across all profile CRUD endpoints. The frontend's writable identity signal reinforces this trust boundary problem rather than mitigating it. No other findings outweighed this critical authorization flaw.
+
+---
+
+## [CodingAgent] 2026-04-27 16:11:33 UTC
+
+Security fix for FEAT-003 reviewer rejection (OWASP A01 / IDOR).
+
+ROOT CAUSE: The original implementation accepted an X-Employee-Id request header as the sole identity source. Any caller could forge any employee identity by simply setting that header. There was no AddAuthentication / UseAuthentication / AddAuthorization / UseAuthorization anywhere in the pipeline.
+
+APPROACH CHOSEN: Implemented a custom DevApiKeyAuthHandler (AuthenticationHandler&lt;DevApiKeyOptions&gt;) that validates an Authorization: Bearer &lt;token&gt; header against a server-owned token→employeeId dictionary loaded from appsettings.Development.json. This is non-forgeable because: (a) the server owns the mapping, (b) clients send an opaque token whose meaning only the server knows, (c) swapping for JWT/OIDC later requires only replacing the scheme registration.
+
+BACKEND CHANGES:
+- Added Authentication/DevApiKeyOptions.cs and Authentication/DevApiKeyAuthHandler.cs (new custom auth scheme)
+- Registered AddAuthentication("DevApiKey") + AddAuthorization() in ServiceCollectionExtensions.cs, reading DevApiKeys from configuration
+- Added app.UseAuthentication() + app.UseAuthorization() to Program.cs (before endpoint mapping, after UseCors)
+- Removed X-Employee-Id header fallback from HttpContextCurrentUserContext.cs; reads ClaimsPrincipal only
+- Replaced AddEndpointFilter&lt;RequireUserIdentityFilter&gt;() with .RequireAuthorization() on the profile route group in ProfileEndpoints.cs
+- Updated RequireUserIdentityFilter.cs to check User.Identity.IsAuthenticated only (header check removed)
+- Added DevApiKeys section to appsettings.Development.json with two demo token→employeeId entries
+- Updated GreenfieldArchitectureApiFactory to inject DevApiKeys via ConfigureAppConfiguration and authenticate via Authorization: Bearer header
+- Updated ProfileEndpointsTests constructor to pass the token string, not the employee ID string
+
+FRONTEND CHANGES:
+- IdentityService: replaced writable signal&lt;string&gt;('employee-001') with private _token + readonly token: Signal&lt;string&gt; = _token.asReadonly() — no external code can overwrite the session token
+- auth.interceptor.ts: sends Authorization: Bearer &lt;token&gt; instead of X-Employee-Id header
+
+RESULT: Build clean (0 warnings, 0 errors), all 89 backend tests pass, all 80 frontend tests pass.
+
+---
+

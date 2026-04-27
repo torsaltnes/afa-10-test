@@ -34,6 +34,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseCors();
 
+// Authentication must run before Authorization and before any endpoint that
+// calls RequireAuthorization().  The DevApiKey scheme populates
+// HttpContext.User from a server-side Bearer token map; HttpContextCurrentUserContext
+// reads the resulting ClaimsPrincipal — no user-supplied header is trusted.
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapHealthEndpoints();
 app.MapHealthChecks("/health/live");
 app.MapDeviationEndpoints();

@@ -1,3 +1,4 @@
+using GreenfieldArchitecture.Api.Authentication;
 using GreenfieldArchitecture.Api.Context;
 using GreenfieldArchitecture.Application.Abstractions.Health;
 using GreenfieldArchitecture.Application.Deviations.Abstractions;
@@ -27,7 +28,27 @@ public static class ServiceCollectionExtensions
         // Required for HttpContextCurrentUserContext to resolve per-request identity.
         services.AddHttpContextAccessor();
 
-        // Health
+        // ── Authentication ─────────────────────────────────────────────────
+        // Load the server-side token→employeeId map from configuration.
+        // The DevApiKeyAuthHandler validates the Bearer token against this map so
+        // that the identity is always resolved server-side (IDOR prevention).
+        // When real JWT/OIDC is introduced, replace the "DevApiKey" scheme with
+        // .AddJwtBearer(...) and remove the DevApiKeys configuration section.
+        var devApiKeys = configuration
+            .GetSection("DevApiKeys")
+            .Get<Dictionary<string, string>>() ?? [];
+
+        services
+            .AddAuthentication("DevApiKey")
+            .AddScheme<DevApiKeyOptions, DevApiKeyAuthHandler>("DevApiKey", options =>
+            {
+                foreach (var kv in devApiKeys)
+                    options.ApiKeys[kv.Key] = kv.Value;
+            });
+
+        services.AddAuthorization();
+
+        // ── Health ─────────────────────────────────────────────────────────
         services.AddScoped<IHealthService, HealthService>();
 
         services.AddSingleton<IApplicationMetadataProvider>(sp =>
@@ -48,11 +69,13 @@ public static class ServiceCollectionExtensions
             return new ApplicationMetadataProvider(serviceName, version, environmentName);
         });
 
-        // Deviations — repository is singleton (in-memory store must outlive request scopes)
+        // ── Deviations ─────────────────────────────────────────────────────
+        // Repository is singleton (in-memory store must outlive request scopes).
         services.AddSingleton<IDeviationRepository, InMemoryDeviationRepository>();
         services.AddScoped<IDeviationService, DeviationService>();
 
-        // Profile — repository is singleton (in-memory store must outlive request scopes).
+        // ── Profile ────────────────────────────────────────────────────────
+        // Repository is singleton (in-memory store must outlive request scopes).
         // ICurrentUserContext is Scoped because it wraps IHttpContextAccessor which is
         // request-specific; it must NOT be Singleton.
         services.AddSingleton<IEmployeeCompetenceProfileRepository, InMemoryEmployeeCompetenceProfileRepository>();

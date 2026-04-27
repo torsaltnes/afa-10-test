@@ -24,7 +24,10 @@ public sealed class ProfileEndpointsTests : IClassFixture<GreenfieldArchitecture
 
     public ProfileEndpointsTests(GreenfieldArchitectureApiFactory factory)
     {
-        _client = factory.CreateAuthenticatedClient("employee-001");
+        // Pass the server-side token (not an employee ID) so that the
+        // DevApiKeyAuthHandler can validate it against its configuration map.
+        // "dev-secret-employee-001" maps to "employee-001" on the server.
+        _client = factory.CreateAuthenticatedClient("dev-secret-employee-001");
         _anonClient = factory.CreateClient();
     }
 

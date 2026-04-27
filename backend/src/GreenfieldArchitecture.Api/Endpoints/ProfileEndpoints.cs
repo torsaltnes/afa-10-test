@@ -1,4 +1,3 @@
-using GreenfieldArchitecture.Api.Filters;
 using GreenfieldArchitecture.Application.Profile.Abstractions;
 using GreenfieldArchitecture.Application.Profile.Contracts;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -7,19 +6,24 @@ namespace GreenfieldArchitecture.Api.Endpoints;
 
 /// <summary>
 /// Minimal API endpoints for the employee competence profile slice.
-/// All routes require a valid caller identity because every operation reads or
-/// writes data that belongs exclusively to the current employee (OWASP A01).
+/// All routes are protected by <c>.RequireAuthorization()</c> so the ASP.NET Core
+/// authentication/authorization pipeline rejects unauthenticated callers with 401
+/// before any handler runs (OWASP A01 / IDOR prevention).
+/// Identity is resolved exclusively from the <see cref="System.Security.Claims.ClaimsPrincipal"/>
+/// populated by the authentication middleware — no user-supplied header is trusted.
 /// </summary>
 public static class ProfileEndpoints
 {
     public static IEndpointRouteBuilder MapProfileEndpoints(this IEndpointRouteBuilder routes)
     {
-        // Apply RequireUserIdentityFilter to the whole group: every profile operation
-        // is personal data and must be scoped to an identified caller.
+        // RequireAuthorization() delegates to the ASP.NET Core authorization middleware
+        // (registered via AddAuthorization / UseAuthorization in Program.cs).
+        // The DevApiKeyAuthHandler validates the Bearer token server-side and builds
+        // the ClaimsPrincipal; any request without a valid token is rejected here.
         var group = routes
             .MapGroup("/api/profile")
             .WithTags("Profile")
-            .AddEndpointFilter<RequireUserIdentityFilter>();
+            .RequireAuthorization();
 
         // ── Profile ──────────────────────────────────────────────────────────
         group.MapGet("/", GetProfileAsync)

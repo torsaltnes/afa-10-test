@@ -1,21 +1,25 @@
 using GreenfieldArchitecture.Application.Profile.Abstractions;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace GreenfieldArchitecture.Api.Context;
 
 /// <summary>
-/// Resolves the current employee identity from the active HTTP request.
-/// Resolution order:
-///   1. <c>HttpContext.User.Identity.Name</c> — populated by real auth middleware (JWT, cookie, etc.)
-///   2. <c>X-Employee-Id</c> request header — used for development / demo scenarios.
-/// Throws <see cref="InvalidOperationException"/> when neither source yields an identity
-/// so that downstream code always receives a non-null, non-empty user id.
+/// Resolves the current employee identity from the authenticated
+/// <see cref="ClaimsPrincipal"/> on the active HTTP request.
+///
+/// The identity is set by <c>DevApiKeyAuthHandler</c> (or, once real auth is
+/// introduced, by the JWT/OIDC middleware) and is therefore server-authoritative.
+/// Unlike the previous implementation, this class no longer reads an
+/// <c>X-Employee-Id</c> request header; accepting a user-supplied header as
+/// identity would constitute an OWASP A01 / IDOR vulnerability.
 /// </summary>
 /// <remarks>
-/// This class lives in the Api project (not Infrastructure) because it has a direct
-/// dependency on <see cref="IHttpContextAccessor"/>, which is an ASP.NET Core
-/// abstraction.  The <see cref="ICurrentUserContext"/> interface remains in the
-/// Application layer so the domain and service layers stay framework-agnostic.
+/// Throws <see cref="InvalidOperationException"/> when the request carries no
+/// authenticated principal so that downstream code never operates without a
+/// verified identity.  Profile endpoints are guarded by
+/// <c>.RequireAuthorization()</c>, which rejects unauthenticated requests with
+/// 401 before this property is ever accessed.
 /// </remarks>
 public sealed class HttpContextCurrentUserContext(IHttpContextAccessor httpContextAccessor) : ICurrentUserContext
 {
@@ -26,19 +30,21 @@ public sealed class HttpContextCurrentUserContext(IHttpContextAccessor httpConte
         {
             var context = httpContextAccessor.HttpContext;
 
-            // Prefer claims identity from a real auth middleware (future-proofs JWT upgrade).
-            var claimsName = context?.User?.Identity?.Name;
+            // Read from the claims principal populated by the authentication middleware.
+            // ClaimTypes.Name is set by DevApiKeyAuthHandler (and will be set by the
+            // JWT/OIDC middleware when real auth is introduced).
+            var claimsName = context?.User?.FindFirst(ClaimTypes.Name)?.Value
+                          ?? context?.User?.Identity?.Name;
+
             if (!string.IsNullOrWhiteSpace(claimsName))
                 return claimsName;
 
-            // Fall back to the explicit header used in the current demo/dev setup.
-            var header = context?.Request.Headers["X-Employee-Id"].ToString();
-            if (!string.IsNullOrWhiteSpace(header))
-                return header;
-
+            // If we reach here, a protected endpoint was reached without authentication.
+            // This should not happen when .RequireAuthorization() is applied correctly.
             throw new InvalidOperationException(
                 "No authenticated user identity is available on this request. " +
-                "Provide an X-Employee-Id header or configure an authentication middleware.");
+                "Ensure the authentication middleware is configured and the endpoint " +
+                "requires authorisation.");
         }
     }
 }
