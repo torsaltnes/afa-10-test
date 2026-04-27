@@ -20,6 +20,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthEndpoints();
 app.MapHealthChecks("/health/live");

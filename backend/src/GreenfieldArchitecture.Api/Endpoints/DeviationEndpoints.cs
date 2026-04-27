@@ -20,23 +20,27 @@ public static class DeviationEndpoints
         group.MapGet("/", ListDeviationsAsync)
             .WithName("ListDeviations")
             .WithSummary("Returns all deviations ordered by last-modified descending.")
+            .AllowAnonymous()
             .Produces<IReadOnlyList<DeviationDto>>(StatusCodes.Status200OK);
 
         group.MapGet("/{id:guid}", GetDeviationByIdAsync)
             .WithName("GetDeviationById")
             .WithSummary("Returns a single deviation by its unique identifier.")
+            .AllowAnonymous()
             .Produces<DeviationDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
 
         group.MapPost("/", CreateDeviationAsync)
             .WithName("CreateDeviation")
             .WithSummary("Creates a new deviation.")
+            .RequireAuthorization()
             .Produces<DeviationDto>(StatusCodes.Status201Created)
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest);
 
         group.MapPut("/{id:guid}", UpdateDeviationAsync)
             .WithName("UpdateDeviation")
             .WithSummary("Replaces an existing deviation.")
+            .RequireAuthorization()
             .Produces<DeviationDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest);
@@ -44,6 +48,7 @@ public static class DeviationEndpoints
         group.MapDelete("/{id:guid}", DeleteDeviationAsync)
             .WithName("DeleteDeviation")
             .WithSummary("Removes a deviation.")
+            .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound);
 
@@ -158,16 +163,16 @@ public static class DeviationEndpoints
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private static bool TryParseSeverity(string value, out DeviationSeverity result) =>
-        Enum.TryParse(value, ignoreCase: true, out result);
+    private static bool TryParseSeverity(string? value, out DeviationSeverity severity)
+        => Enum.TryParse(value, ignoreCase: true, out severity);
 
-    private static bool TryParseStatus(string value, out DeviationStatus result) =>
-        Enum.TryParse(value, ignoreCase: true, out result);
+    private static bool TryParseStatus(string? value, out DeviationStatus status)
+        => Enum.TryParse(value, ignoreCase: true, out status);
 
     private static ProblemDetails Problem(string detail) => new()
     {
+        Status = StatusCodes.Status400BadRequest,
         Title = "Bad Request",
         Detail = detail,
-        Status = StatusCodes.Status400BadRequest,
     };
 }
