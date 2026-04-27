@@ -58,3 +58,9 @@ Updated README.md and CHANGELOG.md for FEAT-003 using the journal as the source 
 
 ---
 
+## [ReleaseWriter] 2026-04-27 12:27:49 UTC
+
+Chose PR title '[FEAT-003] Employee Competence Profile' to preserve the task naming and keep the release note aligned with the approved fullstack implementation. Framed the summary around the delivered education/certificate/course profile flow and highlighted the validation hardening noted in review without overstating scope.
+
+---
+
