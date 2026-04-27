@@ -1,395 +1,395 @@
 # IMPLEMENTATION_PLAN
 
-## 1. Overview
-Initialize a greenfield full-stack baseline with a .NET 10 backend and an Angular 20 frontend.
-Use Clean Architecture on the backend and Angular standalone components + Signals on the frontend.
-Implement a minimal end-to-end health slice so the repository proves project structure, DI, routing, API exposure, frontend integration, and testability.
-The backend must use Minimal APIs only; the frontend must use `bootstrapApplication()` and no NgModules.
+## Feature
+**FEAT-002 — Deviation / Non-conformity Management Feature**
 
-## 2. Folder structure and files to create
-All files below are new because the repository is currently empty.
+## Objective
+Deliver end-to-end CRUD support for deviations/non-conformities through a new Angular 20 feature area and a .NET 10 REST API, using the repository’s existing layered structure while aligning all new work to the mandated Angular 20, Tailwind CSS 4, and ASP.NET Core Minimal API conventions.
 
-```text
-.gitignore                                                           (create)
-global.json                                                          (create)
+## Current-State Summary
+- The repository is a greenfield baseline with only a health-check feature implemented.
+- Frontend stack: Angular 20 standalone app, Tailwind CSS 4, Vitest.
+- Backend stack: .NET 10 solution with Domain / Application / Infrastructure / API layers, Minimal hosting, xUnit integration tests.
+- Current backend `Program.cs` unconditionally calls `UseHttpsRedirection()`, which must be corrected for development per project standards.
+- No deviation/non-conformity domain, API, or UI currently exists.
 
-backend/Directory.Build.props                                        (create)
-backend/Directory.Packages.props                                     (create)
-backend/GreenfieldArchitecture.sln                                   (create)
+## Architectural Decisions
+1. **Backend API will use Minimal APIs, not MVC controllers.**
+   - Although the requirement text mentions `DeviationsController`, the project standard explicitly requires Minimal API endpoint groups.
+   - The feature will still satisfy the required routes: `GET /api/deviations`, `GET /api/deviations/{id}`, `POST /api/deviations`, `PUT /api/deviations/{id}`, `DELETE /api/deviations/{id}`.
+2. **In-memory persistence will be implemented via a singleton repository backed by `ConcurrentDictionary<Guid, Deviation>`.**
+   - Meets the requirement for non-persistent storage.
+   - Avoids controller/service lifetime mismatches.
+3. **All new frontend state will use Angular signals.**
+   - No `BehaviorSubject`-based state for this feature.
+4. **All new UI will use standalone components and built-in Angular control flow.**
+5. **Tailwind theming/customization will stay CSS-first in `styles.css` using `@theme`.**
 
-backend/src/GreenfieldArchitecture.Domain/GreenfieldArchitecture.Domain.csproj                       (create)
-backend/src/GreenfieldArchitecture.Domain/Health/ApplicationMetadata.cs                             (create)
-backend/src/GreenfieldArchitecture.Domain/Health/HealthSnapshot.cs                                  (create)
-backend/src/GreenfieldArchitecture.Domain/Health/HealthState.cs                                     (create)
+## Functional Scope
+The feature must support:
+- List all deviations
+- View a single deviation
+- Create a deviation
+- Edit a deviation
+- Delete a deviation
+- Present severity and status clearly in the UI
+- Validate required user input
+- Surface loading, empty, success, and error states
 
-backend/src/GreenfieldArchitecture.Application/GreenfieldArchitecture.Application.csproj             (create)
-backend/src/GreenfieldArchitecture.Application/Abstractions/Health/IApplicationMetadataProvider.cs  (create)
-backend/src/GreenfieldArchitecture.Application/Abstractions/Health/IHealthService.cs                (create)
-backend/src/GreenfieldArchitecture.Application/Health/Dtos/HealthStatusDto.cs                       (create)
-backend/src/GreenfieldArchitecture.Application/Health/Queries/GetHealthStatusQuery.cs               (create)
-backend/src/GreenfieldArchitecture.Application/Health/Services/HealthService.cs                     (create)
+## Data Model
 
-backend/src/GreenfieldArchitecture.Infrastructure/GreenfieldArchitecture.Infrastructure.csproj       (create)
-backend/src/GreenfieldArchitecture.Infrastructure/Health/ApplicationMetadataProvider.cs              (create)
+### Backend Domain Entity
+`Deviation`
+- `Id: Guid`
+- `Title: string`
+- `Description: string`
+- `Severity: DeviationSeverity`
+- `Status: DeviationStatus`
+- `ReportedBy: string`
+- `ReportedAt: DateTimeOffset`
+- `UpdatedAt: DateTimeOffset`
 
-backend/src/GreenfieldArchitecture.Api/GreenfieldArchitecture.Api.csproj                             (create)
-backend/src/GreenfieldArchitecture.Api/Program.cs                                                    (create)
-backend/src/GreenfieldArchitecture.Api/Endpoints/HealthEndpoints.cs                                  (create)
-backend/src/GreenfieldArchitecture.Api/Extensions/ServiceCollectionExtensions.cs                     (create)
-backend/src/GreenfieldArchitecture.Api/appsettings.json                                              (create)
-backend/src/GreenfieldArchitecture.Api/appsettings.Development.json                                  (create)
-backend/src/GreenfieldArchitecture.Api/Properties/launchSettings.json                                (create)
-backend/src/GreenfieldArchitecture.Api/GreenfieldArchitecture.Api.http                               (create)
+### Enums
+`DeviationSeverity`
+- `Low`
+- `Medium`
+- `High`
+- `Critical`
 
-backend/tests/GreenfieldArchitecture.Application.Tests/GreenfieldArchitecture.Application.Tests.csproj (create)
-backend/tests/GreenfieldArchitecture.Application.Tests/Health/HealthServiceTests.cs                   (create)
+`DeviationStatus`
+- `Open`
+- `InProgress`
+- `Resolved`
+- `Closed`
 
-backend/tests/GreenfieldArchitecture.Api.Tests/GreenfieldArchitecture.Api.Tests.csproj               (create)
-backend/tests/GreenfieldArchitecture.Api.Tests/Infrastructure/GreenfieldArchitectureApiFactory.cs    (create)
-backend/tests/GreenfieldArchitecture.Api.Tests/Health/HealthEndpointsTests.cs                        (create)
+### API Contracts
+Use C# `record` types for all request/response DTOs.
+- `DeviationDto`
+- `CreateDeviationRequest`
+- `UpdateDeviationRequest`
 
-frontend/package.json                                                     (create)
-frontend/angular.json                                                     (create)
-frontend/.postcssrc.json                                                  (create)
-frontend/tsconfig.json                                                    (create)
-frontend/tsconfig.app.json                                                (create)
-frontend/tsconfig.spec.json                                               (create)
-frontend/proxy.conf.json                                                  (create)
-frontend/src/index.html                                                   (create)
-frontend/src/main.ts                                                      (create)
-frontend/src/styles.css                                                   (create)
-frontend/src/app/app.component.ts                                         (create)
-frontend/src/app/app.component.spec.ts                                    (create)
-frontend/src/app/app.config.ts                                            (create)
-frontend/src/app/app.routes.ts                                            (create)
-frontend/src/app/core/models/health-status.model.ts                       (create)
-frontend/src/app/core/services/health-api.service.ts                      (create)
-frontend/src/app/features/health/health-page.component.ts                 (create)
-frontend/src/app/features/health/health-page.component.spec.ts            (create)
-```
+### Serialization Decision
+Configure JSON enum serialization as **strings**, not numeric values, so Angular can bind directly to readable enum names without client-side mapping ambiguity.
 
-Do not create any `*.module.ts` files or `tailwind.config.js`.
+## Backend Design
 
-## 3. Detailed implementation instructions per file
+### Domain Layer
+Create a new `Deviations` feature folder in `GreenfieldArchitecture.Domain` for:
+- `Deviation`
+- `DeviationSeverity`
+- `DeviationStatus`
 
-### Repository root
-- `.gitignore`
-  - Ignore .NET outputs (`bin/`, `obj/`, `.vs/`, `TestResults/`) and frontend outputs (`node_modules/`, `dist/`, `.angular/`, coverage folders).
-  - Include standard OS/editor exclusions.
-- `global.json`
-  - Pin SDK to `.NET 10` (`10.0.100` baseline) with `rollForward` set to `latestFeature`.
+Responsibilities:
+- Represent the canonical business object.
+- Keep invariants simple and explicit.
+- Avoid framework concerns.
 
-### Backend build and solution files
-- `backend/Directory.Build.props`
-  - Apply shared backend defaults: `TargetFramework=net10.0`, `Nullable=enable`, `ImplicitUsings=enable`, `TreatWarningsAsErrors=true`, `LangVersion=latest`.
-  - Keep these settings common for API, Domain, Application, Infrastructure, and test projects.
-- `backend/Directory.Packages.props`
-  - Enable central package management.
-  - Define all backend package versions from section 4 so individual `.csproj` files stay clean.
-- `backend/GreenfieldArchitecture.sln`
-  - Add all backend source and test projects.
-  - Preserve dependency direction: Domain <- Application <- Infrastructure <- API; tests reference targets only.
+### Application Layer
+Create a new `Deviations` feature folder in `GreenfieldArchitecture.Application`.
 
-### Backend domain layer
-- `backend/src/GreenfieldArchitecture.Domain/GreenfieldArchitecture.Domain.csproj`
-  - Plain class library targeting `net10.0`.
-  - No external package references.
-- `backend/src/GreenfieldArchitecture.Domain/Health/ApplicationMetadata.cs`
-  - Record: `ApplicationMetadata`.
-  - Properties: `ServiceName`, `Version`, `EnvironmentName`.
-  - Represents immutable metadata supplied by infrastructure.
-- `backend/src/GreenfieldArchitecture.Domain/Health/HealthSnapshot.cs`
-  - Record: `HealthSnapshot`.
-  - Properties: `HealthState Status`, `ApplicationMetadata Metadata`, `DateTimeOffset CheckedAtUtc`.
-  - Domain object used by the application service before mapping to DTO.
-- `backend/src/GreenfieldArchitecture.Domain/Health/HealthState.cs`
-  - Enum: `Healthy` only for the initial slice.
-  - Keep extensible for future `Degraded` / `Unhealthy` states.
+Planned components:
+- `Abstractions/IDeviationRepository`
+- `Abstractions/IDeviationService`
+- `Contracts/DeviationDto`
+- `Contracts/CreateDeviationRequest`
+- `Contracts/UpdateDeviationRequest`
+- `Mappings/DeviationMappings` (or equivalent mapper helper)
+- `Services/DeviationService`
 
-### Backend application layer
-- `backend/src/GreenfieldArchitecture.Application/GreenfieldArchitecture.Application.csproj`
-  - Class library targeting `net10.0`.
-  - Reference Domain only.
-- `backend/src/GreenfieldArchitecture.Application/Abstractions/Health/IApplicationMetadataProvider.cs`
-  - Interface: `IApplicationMetadataProvider`.
-  - Method: `ApplicationMetadata GetMetadata()`.
-  - Infrastructure implements this; Application depends on the abstraction only.
-- `backend/src/GreenfieldArchitecture.Application/Abstractions/Health/IHealthService.cs`
-  - Interface: `IHealthService`.
-  - Method: `Task<HealthStatusDto> GetAsync(GetHealthStatusQuery query, CancellationToken cancellationToken = default)`.
-- `backend/src/GreenfieldArchitecture.Application/Health/Dtos/HealthStatusDto.cs`
-  - Record: `HealthStatusDto`.
-  - Properties: `string Status`, `string ServiceName`, `string Version`, `string Environment`, `DateTimeOffset CheckedAtUtc`.
-  - This is the HTTP contract returned by the endpoint.
-- `backend/src/GreenfieldArchitecture.Application/Health/Queries/GetHealthStatusQuery.cs`
-  - Record: `GetHealthStatusQuery` with no mutable state.
-  - Keep as the first command/query object to enforce the project pattern from day one.
-- `backend/src/GreenfieldArchitecture.Application/Health/Services/HealthService.cs`
-  - Sealed class: `HealthService` using a primary constructor.
-  - Dependencies: `IApplicationMetadataProvider`, `TimeProvider`.
-  - Method: `GetAsync(...)`.
-  - Behavior:
-    - Read application metadata from the provider.
-    - Build a `HealthSnapshot` with `HealthState.Healthy` and UTC timestamp from `TimeProvider`.
-    - Map the domain object to `HealthStatusDto`.
-  - Patterns:
-    - No ASP.NET references.
-    - Validate any string inputs with `ArgumentException.ThrowIfNullOrWhiteSpace` if fallback logic is needed.
-    - If any async calls are later introduced, use `ConfigureAwait(false)` in this library project.
+Service responsibilities:
+- Orchestrate CRUD operations.
+- Validate required string fields with `ArgumentException.ThrowIfNullOrWhiteSpace`.
+- Set `ReportedAt` and `UpdatedAt` on create.
+- Preserve `ReportedAt` and refresh `UpdatedAt` on update.
+- Return `null`/result objects for missing records so the API layer can map to `404`.
+- Use primary constructor injection.
+- Use `ConfigureAwait(false)` in library projects.
 
-### Backend infrastructure layer
-- `backend/src/GreenfieldArchitecture.Infrastructure/GreenfieldArchitecture.Infrastructure.csproj`
-  - Class library targeting `net10.0`.
-  - Reference Application and Domain.
-- `backend/src/GreenfieldArchitecture.Infrastructure/Health/ApplicationMetadataProvider.cs`
-  - Sealed class: `ApplicationMetadataProvider` using a primary constructor.
-  - Constructor inputs: `string serviceName`, `string version`, `string environmentName`.
-  - Method: `GetMetadata()` returning `ApplicationMetadata`.
-  - Validate constructor arguments with `ArgumentException.ThrowIfNullOrWhiteSpace`.
-  - Keep this class pure; no direct ASP.NET dependency inside the implementation.
+Validation baseline:
+- `Title`, `Description`, `ReportedBy` required
+- `Severity` must be a defined enum value
+- `Status` must be a defined enum value
 
-### Backend API layer
-- `backend/src/GreenfieldArchitecture.Api/GreenfieldArchitecture.Api.csproj`
-  - Web SDK project targeting `net10.0`.
-  - Reference Application and Infrastructure.
-  - Include package reference for OpenAPI only.
+### Infrastructure Layer
+Create a `Deviations` feature folder in `GreenfieldArchitecture.Infrastructure`.
+
+Planned component:
+- `Repositories/InMemoryDeviationRepository`
+
+Repository behavior:
+- Register as singleton.
+- Store items in `ConcurrentDictionary<Guid, Deviation>`.
+- Implement async CRUD methods.
+- Return collection ordered by most recently updated first for better UI usability.
+- Keep implementation intentionally simple and in-memory only.
+
+### API Layer
+Create a `Deviations` feature folder in `GreenfieldArchitecture.Api`.
+
+Planned components:
+- `Endpoints/DeviationEndpoints.cs`
+- service registration updates in existing API extension file(s)
+- `Program.cs` updates
+- `Properties/launchSettings.json` create/update
+
+#### Endpoint Group
+Map `/api/deviations` through `MapGroup()` and `.WithTags("Deviations")`.
+
+#### Endpoint Contracts
+- `GET /api/deviations`
+  - `200 OK` with `IReadOnlyList<DeviationDto>`
+- `GET /api/deviations/{id}`
+  - `200 OK` with `DeviationDto`
+  - `404 Not Found` when absent
+- `POST /api/deviations`
+  - `201 Created` with created `DeviationDto`
+  - `400 Bad Request` for invalid payload
+- `PUT /api/deviations/{id}`
+  - `200 OK` with updated `DeviationDto`
+  - `404 Not Found` when absent
+  - `400 Bad Request` for invalid payload
+- `DELETE /api/deviations/{id}`
+  - `204 No Content` on success
+  - `404 Not Found` when absent
+
+#### API Implementation Rules
+- Use Minimal API handlers exclusively.
+- Use `TypedResults` / typed union results.
+- Keep handlers thin; delegate logic to `IDeviationService`.
+- Tag endpoints for OpenAPI.
+- Accept `CancellationToken` in async handlers.
+
+### Cross-Cutting Backend Changes
+1. **CORS**
+   - Add default policy allowing:
+     - `http://localhost:4200`
+     - `https://localhost:4200`
+   - Required so Angular can call the API during development.
+2. **HTTPS redirection**
+   - Change `Program.cs` to call `UseHttpsRedirection()` only when `!app.Environment.IsDevelopment()`.
+3. **launchSettings**
+   - Ensure `backend/src/GreenfieldArchitecture.Api/Properties/launchSettings.json` contains:
+     - HTTP profile on port `5000`
+     - HTTPS profile on port `5001` and `5000`
+4. **OpenAPI**
+   - Keep development OpenAPI exposure.
+5. **Service registration**
+   - Register deviation service as scoped.
+   - Register in-memory deviation repository as singleton.
+
+## Frontend Design
+
+### Routing Strategy
+Add a lazy-loaded standalone route for the deviations feature, likely under:
+- `/deviations`
+
+Routing updates should preserve the current standalone routing style already used by the app.
+
+### Frontend Models
+Create shared client models under `frontend/src/app/core/models`:
+- `deviation.model.ts`
+- `deviation-severity.type.ts` or equivalent
+- `deviation-status.type.ts` or equivalent
+
+Prefer string-based types/enums matching backend JSON values.
+
+### API Service
+Create `frontend/src/app/core/services/deviation-api.service.ts`.
+
+Responsibilities:
+- Use `inject(HttpClient)`.
+- Expose CRUD methods for `/api/deviations`.
+- Keep transport logic isolated from components.
+- Return typed observables/promises as appropriate for the app’s existing pattern.
+
+### Feature Composition
+Create a new feature folder under `frontend/src/app/features/deviations`.
+
+Recommended component split:
+- `deviations-page.component.ts`
+  - smart/container component
+  - owns signals for screen state
+  - loads list data
+  - coordinates create/edit/delete flows
+- `deviation-list.component.ts`
+  - table rendering
+  - emits edit/delete/view actions
+- `deviation-form.component.ts`
+  - create/edit form
+  - reactive form with validation
+  - receives mode + initial value through signal inputs
+- optional presentational helpers:
+  - `deviation-status-badge.component.ts`
+  - `deviation-severity-badge.component.ts`
+  - `delete-confirmation.component.ts`
+
+### State Management
+Use Angular signals as the primary state primitive.
+
+Suggested state shape in the container component:
+- `deviations = signal<DeviationModel[]>([])`
+- `selectedDeviationId = signal<string | null>(null)`
+- `isLoading = signal<boolean>(false)`
+- `errorMessage = signal<string | null>(null)`
+- `isEditorOpen = signal<boolean>(false)`
+- `editorMode = signal<'create' | 'edit'>('create')`
+
+Use `computed()` for:
+- sorted rows
+- selected deviation lookup
+- empty-state visibility
+- form title / submit label
+
+Use `@if`, `@else`, and `@for` in templates; do not use `*ngIf` or `*ngFor`.
+
+### Form Design
+Use Angular reactive forms for data entry.
+
+Form fields:
+- Title
+- Description
+- Severity
+- Status
+- ReportedBy
+
+Behavior:
+- In create mode, initialize sensible defaults (for example `Status = Open`).
+- In edit mode, prefill the selected deviation.
+- Disable submit while invalid or while save is pending.
+- Surface inline validation messages.
+
+### UX Requirements
+The feature UI should include:
+- Page header and feature description
+- Primary action to create a deviation
+- Readable table/list of deviations
+- Severity/status badges with visual differentiation
+- Empty state when no deviations exist
+- Loading indicator while fetching
+- Error banner/toast area for failed requests
+- Delete confirmation before destructive action
+
+### Styling Strategy
+Use Tailwind CSS 4 utilities and CSS-first theming.
+
+Planned styling changes:
+- Extend `frontend/src/styles.css` with `@theme` tokens for deviation severity/status colors if needed.
+- Use semantic utility composition for:
+  - page layout
+  - cards/panels
+  - table spacing
+  - form field spacing
+  - button hierarchy
+- Use `gap-*` utilities for layout spacing.
+- Support dark mode with `dark:` variants where existing app styling allows.
+- Avoid hardcoded color hex values in templates; prefer theme tokens.
+
+## Testing Strategy
+
+### Backend Application Tests
+Add unit tests for `DeviationService` covering:
+- create sets timestamps and id
+- list returns all items
+- get by id returns record when present
+- get by id returns missing result when absent
+- update preserves `ReportedAt` and changes `UpdatedAt`
+- delete removes record
+- validation failures for missing required fields
+
+Use:
+- xUnit
+- FluentAssertions
+- Moq
+
+### Backend API Integration Tests
+Add `WebApplicationFactory<Program>` tests covering:
+- `GET /api/deviations` returns `200`
+- `POST /api/deviations` creates a record and returns `201`
+- `GET /api/deviations/{id}` returns created record
+- `PUT /api/deviations/{id}` updates fields
+- `DELETE /api/deviations/{id}` returns `204`
+- missing id paths return `404`
+- invalid payload returns `400`
+
+### Frontend Tests
+Add Vitest-based tests for:
+- API service request mapping
+- container component loading/success/error state transitions
+- form validation rules
+- create/edit mode switching
+- delete confirmation behavior
+- rendering of empty state and populated table
+
+## Implementation Sequence
+1. Add backend domain enums/entity.
+2. Add application contracts, abstractions, mappings, and service.
+3. Add in-memory repository implementation.
+4. Register services/repository in API composition root.
+5. Add Minimal API endpoint group for deviations.
+6. Update `Program.cs` for endpoint mapping, CORS, and conditional HTTPS redirection.
+7. Create/update `launchSettings.json` with required HTTP/HTTPS profiles.
+8. Add backend unit and integration tests.
+9. Add frontend models and API service.
+10. Add deviations feature route and standalone components.
+11. Add reactive form handling, signal-based screen state, and CRUD interactions.
+12. Update Tailwind theme tokens/styles if required.
+13. Add frontend tests.
+14. Run full backend/frontend test suite and smoke-test CRUD manually.
+
+## Planned Files
+
+### Backend — Create
+- `backend/src/GreenfieldArchitecture.Domain/Deviations/Deviation.cs`
+- `backend/src/GreenfieldArchitecture.Domain/Deviations/DeviationSeverity.cs`
+- `backend/src/GreenfieldArchitecture.Domain/Deviations/DeviationStatus.cs`
+- `backend/src/GreenfieldArchitecture.Application/Deviations/Abstractions/IDeviationRepository.cs`
+- `backend/src/GreenfieldArchitecture.Application/Deviations/Abstractions/IDeviationService.cs`
+- `backend/src/GreenfieldArchitecture.Application/Deviations/Contracts/DeviationDto.cs`
+- `backend/src/GreenfieldArchitecture.Application/Deviations/Contracts/CreateDeviationRequest.cs`
+- `backend/src/GreenfieldArchitecture.Application/Deviations/Contracts/UpdateDeviationRequest.cs`
+- `backend/src/GreenfieldArchitecture.Application/Deviations/Mappings/DeviationMappings.cs`
+- `backend/src/GreenfieldArchitecture.Application/Deviations/Services/DeviationService.cs`
+- `backend/src/GreenfieldArchitecture.Infrastructure/Deviations/Repositories/InMemoryDeviationRepository.cs`
+- `backend/src/GreenfieldArchitecture.Api/Endpoints/DeviationEndpoints.cs`
+- `backend/src/GreenfieldArchitecture.Api/Properties/launchSettings.json` (if missing)
+- `backend/tests/GreenfieldArchitecture.Application.Tests/Deviations/DeviationServiceTests.cs`
+- `backend/tests/GreenfieldArchitecture.Api.Tests/Deviations/DeviationEndpointsTests.cs`
+
+### Backend — Modify
 - `backend/src/GreenfieldArchitecture.Api/Program.cs`
-  - Use top-level statements.
-  - Configure services by calling `AddProjectServices(...)` from the extension file.
-  - Add built-in health checks with `AddHealthChecks()`.
-  - Add OpenAPI.
-  - Build pipeline with HTTPS redirection.
-  - Map endpoints:
-    - `app.MapHealthEndpoints()` for `/api/health`
-    - `app.MapHealthChecks("/health/live")` for infrastructure liveness
-    - `app.MapOpenApi()` in development
-  - Declare `public partial class Program` for `WebApplicationFactory` support.
-  - Use Minimal APIs only; do not add MVC controllers.
-- `backend/src/GreenfieldArchitecture.Api/Endpoints/HealthEndpoints.cs`
-  - Static class: `HealthEndpoints`.
-  - Method: `RouteGroupBuilder MapHealthEndpoints(this IEndpointRouteBuilder routes)`.
-  - Create route group `/api/health` with `.WithTags("Health")`.
-  - Add `MapGet("/", ...)` handler that:
-    - Accepts `IHealthService` and `CancellationToken`.
-    - Calls `GetAsync(new GetHealthStatusQuery(), cancellationToken)`.
-    - Returns `TypedResults.Ok(dto)`.
-  - Add endpoint metadata (`WithName`, `WithSummary`, optionally `Produces<HealthStatusDto>(StatusCodes.Status200OK)`).
-- `backend/src/GreenfieldArchitecture.Api/Extensions/ServiceCollectionExtensions.cs`
-  - Static class: `ServiceCollectionExtensions`.
-  - Method: `IServiceCollection AddProjectServices(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)`.
-  - Register:
-    - `TimeProvider.System` as singleton.
-    - `IHealthService` -> `HealthService` as scoped.
-    - `IApplicationMetadataProvider` -> `ApplicationMetadataProvider` using a factory lambda.
-  - Derive version from the entry assembly and service name from configuration with fallback to `environment.ApplicationName`.
-  - Validate derived values before constructing the provider.
-- `backend/src/GreenfieldArchitecture.Api/appsettings.json`
-  - Include `Application:Name` and standard logging configuration.
-  - Keep secrets out of source control.
-- `backend/src/GreenfieldArchitecture.Api/appsettings.Development.json`
-  - Development logging overrides only.
-- `backend/src/GreenfieldArchitecture.Api/Properties/launchSettings.json`
-  - Create a local development profile with fixed HTTP/HTTPS ports.
-  - Set `launchUrl` to `api/health` for smoke testing.
-- `backend/src/GreenfieldArchitecture.Api/GreenfieldArchitecture.Api.http`
-  - Include manual requests for `GET /api/health` and `GET /health/live`.
+- existing API DI/extension registration file(s) under `backend/src/GreenfieldArchitecture.Api/Extensions/`
+- existing project files only if new source inclusion is required
 
-### Backend tests
-- `backend/tests/GreenfieldArchitecture.Application.Tests/GreenfieldArchitecture.Application.Tests.csproj`
-  - Test project targeting `net10.0`.
-  - Reference Application and Domain.
-  - Add xUnit, Moq, FluentAssertions, and test SDK packages.
-- `backend/tests/GreenfieldArchitecture.Application.Tests/Health/HealthServiceTests.cs`
-  - Test class: `HealthServiceTests`.
-  - Cover:
-    - healthy response mapping
-    - metadata mapping from `IApplicationMetadataProvider`
-    - deterministic timestamp from a fake/stub `TimeProvider`
-  - Use `Moq` for `IApplicationMetadataProvider`.
-- `backend/tests/GreenfieldArchitecture.Api.Tests/GreenfieldArchitecture.Api.Tests.csproj`
-  - Test project targeting `net10.0`.
-  - Reference API project.
-  - Add xUnit, FluentAssertions, test SDK, and `Microsoft.AspNetCore.Mvc.Testing`.
-- `backend/tests/GreenfieldArchitecture.Api.Tests/Infrastructure/GreenfieldArchitectureApiFactory.cs`
-  - Sealed class inheriting `WebApplicationFactory<Program>`.
-  - Keep customization minimal; only add overrides when future tests need them.
-- `backend/tests/GreenfieldArchitecture.Api.Tests/Health/HealthEndpointsTests.cs`
-  - Test class: `HealthEndpointsTests`.
-  - Use `HttpClient` from the factory.
-  - Cover:
-    - `GET /api/health` returns 200
-    - response JSON matches the DTO contract
-    - `GET /health/live` returns 200
+### Frontend — Create
+- `frontend/src/app/core/models/deviation.model.ts`
+- `frontend/src/app/core/models/deviation-severity.type.ts`
+- `frontend/src/app/core/models/deviation-status.type.ts`
+- `frontend/src/app/core/services/deviation-api.service.ts`
+- `frontend/src/app/features/deviations/deviations-page.component.ts`
+- `frontend/src/app/features/deviations/deviations-page.component.html`
+- `frontend/src/app/features/deviations/deviation-list.component.ts`
+- `frontend/src/app/features/deviations/deviation-form.component.ts`
+- optional badge/confirmation helper components as needed
+- `frontend/src/app/core/services/deviation-api.service.spec.ts`
+- `frontend/src/app/features/deviations/deviations-page.component.spec.ts`
+- `frontend/src/app/features/deviations/deviation-form.component.spec.ts`
 
-### Frontend workspace and tooling
-- `frontend/package.json`
-  - Create the Angular workspace package manifest; do not mark this as modify.
-  - Scripts: `start`, `build`, `test`, `test:watch`.
-  - Use Angular 20 packages, Tailwind 4 packages, and Vitest-based test tooling.
-- `frontend/angular.json`
-  - Configure one application project named `greenfield-frontend`.
-  - Build target: `@angular/build:application`.
-  - Test target: `@angular/build:unit-test` with `runner: "vitest"` and `tsConfig: "tsconfig.spec.json"`.
-  - Serve target must use `proxy.conf.json`.
-  - Use `src/styles.css` as the single global stylesheet.
-- `frontend/.postcssrc.json`
-  - Configure PostCSS with `@tailwindcss/postcss` only.
-  - Do not introduce `tailwind.config.js`.
-- `frontend/tsconfig.json`
-  - Enable strict TypeScript options suitable for Angular 20.
-- `frontend/tsconfig.app.json`
-  - App compilation config including `src/main.ts`.
-- `frontend/tsconfig.spec.json`
-  - Extend `tsconfig.json`.
-  - Include `src/**/*.spec.ts` and `src/**/*.d.ts`.
-  - Add `types: ["vitest/globals", "node"]`.
-- `frontend/proxy.conf.json`
-  - Proxy `/api` and `/health` to the backend development URL from `launchSettings.json`.
-  - Set `secure: false` if the proxy targets local HTTPS.
+### Frontend — Modify
+- frontend route definition file(s) to register `/deviations`
+- `frontend/src/styles.css` for any new `@theme` tokens
+- existing navigation/home page component if a link to the feature is required
 
-### Frontend runtime files
-- `frontend/src/index.html`
-  - Standard Angular host page with `<app-root></app-root>`.
-  - Keep only essential metadata.
-- `frontend/src/main.ts`
-  - Bootstrap with `bootstrapApplication(AppComponent, appConfig)`.
-  - No NgModule bootstrap.
-- `frontend/src/styles.css`
-  - Import Tailwind with `@import "tailwindcss";`.
-  - Define design tokens in `@theme` blocks only.
-  - Add app-wide CSS variables for brand, surface, success, danger, spacing, and radius tokens.
-  - Do not add hardcoded utility color classes; use token-backed utilities.
-- `frontend/src/app/app.config.ts`
-  - Export `appConfig: ApplicationConfig`.
-  - Register `provideRouter(routes)` and `provideHttpClient()`.
-- `frontend/src/app/app.routes.ts`
-  - Define the root route using `loadComponent` to lazy-load the health page.
-  - Add a wildcard redirect back to the root health route.
-- `frontend/src/app/app.component.ts`
-  - Standalone component: `AppComponent`.
-  - Use `ChangeDetectionStrategy.OnPush`.
-  - Import `RouterOutlet`.
-  - Template should render a simple shell/header and the routed page.
-  - No constructor DI.
-- `frontend/src/app/core/models/health-status.model.ts`
-  - Export a TypeScript `type` or `interface` matching the backend DTO exactly:
-    - `status`
-    - `serviceName`
-    - `version`
-    - `environment`
-    - `checkedAtUtc`
-- `frontend/src/app/core/services/health-api.service.ts`
-  - Injectable service: `HealthApiService` with `providedIn: 'root'`.
-  - Use `inject(HttpClient)`.
-  - Method: `getHealth()` returning `Observable<HealthStatus>` from `/api/health`.
-  - Keep the service stateless; do not use `BehaviorSubject`.
-- `frontend/src/app/features/health/health-page.component.ts`
-  - Standalone component: `HealthPageComponent`.
-  - Use `ChangeDetectionStrategy.OnPush`.
-  - Use `inject(HealthApiService)`.
-  - Use Signals-based state, preferably `rxResource()` for the async fetch.
-  - Required members:
-    - `healthResource`
-    - computed `isHealthy`
-    - computed `statusLabel`
-    - `reload()` action for a manual refresh button
-  - Template rules:
-    - use `@if` / `@else`
-    - do not use `*ngIf` / `*ngFor`
-    - render loading, success, and error states
-    - apply Tailwind utility classes backed by `@theme` tokens
-- `frontend/src/app/app.component.spec.ts`
-  - Standalone component test for `AppComponent`.
-  - Configure `TestBed` with `imports: [AppComponent]` and router providers.
-  - Verify the shell creates successfully and includes the router outlet region.
-- `frontend/src/app/features/health/health-page.component.spec.ts`
-  - Standalone component test for `HealthPageComponent`.
-  - Configure `TestBed` with standalone imports plus `provideHttpClient()` and `provideHttpClientTesting()`.
-  - Verify loading, successful response rendering, error rendering, and manual reload behavior.
+## Risks / Open Questions
+- The supplied requirement excerpt is truncated, so any unstated UI details should be validated before implementation begins.
+- If the current frontend route/navigation shell is intentionally minimal, adding discoverable navigation may require one extra shared-layout change.
+- In-memory storage means all data resets on restart; this is acceptable only if the requirement remains explicitly non-persistent.
+- If the existing API serializes enums numerically today, enabling string enums is a deliberate contract improvement and should be applied consistently for the new feature.
 
-## 4. Dependencies
-
-### Backend NuGet packages
-Use central package management in `backend/Directory.Packages.props`.
-
-- `Microsoft.AspNetCore.OpenApi` — `10.0.7` (API project)
-- `Microsoft.NET.Test.Sdk` — `18.5.0` (both test projects)
-- `xunit` — `2.9.3` (both test projects)
-- `xunit.runner.visualstudio` — `3.1.5` (both test projects)
-- `Moq` — `4.20.72` (application test project)
-- `FluentAssertions` — `8.9.0` (both test projects)
-- `Microsoft.AspNetCore.Mvc.Testing` — `10.0.7` (API integration test project)
-
-### Frontend npm packages
-
-#### dependencies
-- `@angular/common`
-- `@angular/compiler`
-- `@angular/core`
-- `@angular/platform-browser`
-- `@angular/router`
-- `rxjs`
-- `tslib`
-- `zone.js`
-- `tailwindcss`
-
-#### devDependencies
-- `@angular/build`
-- `@angular/cli`
-- `@angular/compiler-cli`
-- `@tailwindcss/postcss`
-- `postcss`
-- `typescript`
-- `vitest`
-- `jsdom`
-- `@types/node`
-
-## 5. Automated tests
-
-### Test files to create
-```text
-backend/tests/GreenfieldArchitecture.Application.Tests/GreenfieldArchitecture.Application.Tests.csproj
-backend/tests/GreenfieldArchitecture.Application.Tests/Health/HealthServiceTests.cs
-backend/tests/GreenfieldArchitecture.Api.Tests/GreenfieldArchitecture.Api.Tests.csproj
-backend/tests/GreenfieldArchitecture.Api.Tests/Infrastructure/GreenfieldArchitectureApiFactory.cs
-backend/tests/GreenfieldArchitecture.Api.Tests/Health/HealthEndpointsTests.cs
-frontend/src/app/app.component.spec.ts
-frontend/src/app/features/health/health-page.component.spec.ts
-```
-
-### What to test
-- `backend/tests/GreenfieldArchitecture.Application.Tests/Health/HealthServiceTests.cs`
-  - service returns `Healthy`
-  - DTO fields are mapped from domain metadata correctly
-  - timestamp comes from injected `TimeProvider`, not `DateTime.UtcNow`
-- `backend/tests/GreenfieldArchitecture.Api.Tests/Health/HealthEndpointsTests.cs`
-  - `/api/health` returns HTTP 200
-  - JSON payload shape matches the contract expected by the frontend
-  - `/health/live` returns HTTP 200
-- `frontend/src/app/app.component.spec.ts`
-  - app shell bootstraps as a standalone component
-  - routing infrastructure is wired correctly enough for the shell to render
-- `frontend/src/app/features/health/health-page.component.spec.ts`
-  - loading state appears before the HTTP response resolves
-  - success state renders backend values after a 200 response
-  - error state renders when the API fails
-  - clicking refresh triggers a new request and updates signals/resource state
-
-## 6. Acceptance criteria
-- **Backend Project Structure**
-  - Fulfilled by creating the `/backend` folder, solution file, and the four Clean Architecture source projects plus tests.
-- **HealthCheck Controller Implementation**
-  - The intake wording mentions a controller, but implementation must use Minimal APIs to satisfy the architecture constraints.
-  - `backend/src/GreenfieldArchitecture.Api/Endpoints/HealthEndpoints.cs` fulfills the same behavior: a GET endpoint returning `200 OK` with health status data.
-- **Backend Compilation**
-  - Fulfilled by a complete `net10.0` solution layout with valid project references and central package management.
-- **Frontend Project Structure**
-  - Fulfilled by creating the `/frontend` Angular workspace with `package.json`, `angular.json`, TypeScript configs, app source files, and proxy configuration.
-- **Angular Standalone Architecture**
-  - Fulfilled by `src/main.ts` using `bootstrapApplication()`, `app.config.ts` using provider functions, standalone routed components, and zero NgModules.
-- **Frontend Health Experience**
-  - Fulfilled by `HealthPageComponent`, which calls `/api/health`, renders loading/success/error states, and uses Signals-based reactive state.
-- **Automated Test Coverage**
-  - Fulfilled by xUnit unit + integration tests on the backend and `.spec.ts` component tests on the frontend.
-- **Modern Architecture Baseline for Future Development**
-  - Fulfilled by Clean Architecture boundaries, immutable DTO/query records, minimal API endpoint grouping, Tailwind 4 CSS-first theming, and Angular 20 standalone/signal conventions that can be extended feature-by-feature.
+## Definition of Done
+The feature is complete when:
+- all required deviation CRUD endpoints exist under `/api/deviations`
+- the Angular app exposes a working deviations UI for create/read/update/delete
+- new backend and frontend tests pass
+- local Angular-to-API development works via CORS
+- development startup works over HTTP without forced HTTPS redirects
+- implementation follows Angular 20 standalone/signals conventions, Tailwind CSS 4 CSS-first theming, and .NET 10 Minimal API/Clean Architecture patterns

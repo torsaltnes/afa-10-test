@@ -9,6 +9,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'deviations',
+    loadComponent: () =>
+      import('./features/deviations/deviations-page.component').then(
+        (m) => m.DeviationsPageComponent
+      ),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

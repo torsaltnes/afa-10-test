@@ -1,5 +1,8 @@
 using GreenfieldArchitecture.Application.Abstractions.Health;
+using GreenfieldArchitecture.Application.Deviations.Abstractions;
+using GreenfieldArchitecture.Application.Deviations.Services;
 using GreenfieldArchitecture.Application.Health.Services;
+using GreenfieldArchitecture.Infrastructure.Deviations.Repositories;
 using GreenfieldArchitecture.Infrastructure.Health;
 using System.Reflection;
 
@@ -17,6 +20,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton(TimeProvider.System);
 
+        // Health
         services.AddScoped<IHealthService, HealthService>();
 
         services.AddSingleton<IApplicationMetadataProvider>(sp =>
@@ -36,6 +40,10 @@ public static class ServiceCollectionExtensions
 
             return new ApplicationMetadataProvider(serviceName, version, environmentName);
         });
+
+        // Deviations — repository is singleton (in-memory store must outlive request scopes)
+        services.AddSingleton<IDeviationRepository, InMemoryDeviationRepository>();
+        services.AddScoped<IDeviationService, DeviationService>();
 
         return services;
     }

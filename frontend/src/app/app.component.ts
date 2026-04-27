@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
     <div class="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
 
@@ -16,7 +16,7 @@ import { RouterOutlet } from '@angular/router';
                px-6 py-4 shadow-sm
                dark:border-gray-700/60 dark:bg-surface-dark/95"
       >
-        <div class="mx-auto flex max-w-5xl items-center gap-3">
+        <div class="mx-auto flex max-w-5xl items-center gap-6">
 
           <!-- Logo badge -->
           <span
@@ -27,9 +27,36 @@ import { RouterOutlet } from '@angular/router';
           >G</span>
 
           <!-- App name -->
-          <h1 class="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+          <span class="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100">
             Greenfield Architecture
-          </h1>
+          </span>
+
+          <!-- Nav links -->
+          <nav class="flex items-center gap-1 ml-auto" aria-label="Main navigation">
+            <a
+              routerLink="/"
+              routerLinkActive="bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+              [routerLinkActiveOptions]="{ exact: true }"
+              class="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600
+                     transition-colors duration-150
+                     hover:bg-gray-100 hover:text-gray-900
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
+                     dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+            >
+              Health
+            </a>
+            <a
+              routerLink="/deviations"
+              routerLinkActive="bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+              class="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600
+                     transition-colors duration-150
+                     hover:bg-gray-100 hover:text-gray-900
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
+                     dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+            >
+              Deviations
+            </a>
+          </nav>
 
         </div>
       </header>

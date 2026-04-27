@@ -1,0 +1,226 @@
+<section class="flex flex-col gap-6" aria-live="polite">
+
+  <!-- ─── Page header ─────────────────────────────────────────────────────── -->
+  <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex flex-col gap-1">
+      <h2 class="text-2xl font-semibold tracking-tight text-balance
+                 text-gray-900 dark:text-gray-100">
+        Deviations
+      </h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Track and manage non-conformities and quality deviations.
+      </p>
+    </div>
+    <button
+      type="button"
+      (click)="openCreateEditor()"
+      class="self-start rounded-md bg-primary px-4 py-2 text-sm font-medium
+             text-white transition-colors duration-150
+             hover:bg-primary-hover
+             focus-visible:outline-none focus-visible:ring-2
+             focus-visible:ring-primary focus-visible:ring-offset-2
+             sm:self-auto"
+    >
+      + New deviation
+    </button>
+  </div>
+  <!-- ─────────────────────────────────────────────────────────────────────── -->
+
+  <!-- ─── Error banner ────────────────────────────────────────────────────── -->
+  @if (errorMessage()) {
+    <div
+      class="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4
+             dark:border-red-800/40 dark:bg-red-900/20"
+      role="alert"
+    >
+      <svg class="mt-0.5 size-5 shrink-0 text-danger" viewBox="0 0 20 20"
+           fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0
+             00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10
+             11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75
+             0 00-1.06-1.06L10 8.94 8.28 7.22z"
+          clip-rule="evenodd" />
+      </svg>
+      <div class="flex flex-col gap-1">
+        <p class="text-sm font-semibold text-red-800 dark:text-red-300">
+          {{ errorMessage() }}
+        </p>
+      </div>
+    </div>
+  }
+  <!-- ─────────────────────────────────────────────────────────────────────── -->
+
+  <!-- ─── Loading state ───────────────────────────────────────────────────── -->
+  @if (isLoading()) {
+    <div
+      class="flex min-h-48 items-center justify-center rounded-xl
+             border border-gray-200 bg-surface p-12
+             dark:border-gray-700 dark:bg-surface-dark"
+      role="status"
+      aria-label="Loading deviations"
+    >
+      <div class="flex flex-col items-center gap-3">
+        <div
+          class="size-10 animate-spin rounded-full border-4
+                 border-primary border-t-transparent"
+          aria-hidden="true"
+        ></div>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Loading deviations…</p>
+      </div>
+    </div>
+
+  <!-- ─── Empty state ──────────────────────────────────────────────────────── -->
+  } @else if (isEmpty()) {
+    <div
+      class="flex min-h-48 flex-col items-center justify-center gap-4
+             rounded-xl border border-dashed border-gray-300 bg-surface p-12
+             dark:border-gray-600 dark:bg-surface-dark"
+    >
+      <svg class="size-12 text-gray-300 dark:text-gray-600" fill="none"
+           viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"
+           aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2
+             2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0
+             012-2h2a2 2 0 012 2" />
+      </svg>
+      <div class="flex flex-col items-center gap-1 text-center">
+        <p class="font-medium text-gray-900 dark:text-gray-100">No deviations yet</p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          Create your first deviation to get started.
+        </p>
+      </div>
+      <button
+        type="button"
+        (click)="openCreateEditor()"
+        class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white
+               transition-colors duration-150
+               hover:bg-primary-hover
+               focus-visible:outline-none focus-visible:ring-2
+               focus-visible:ring-primary"
+      >
+        + New deviation
+      </button>
+    </div>
+
+  <!-- ─── Populated table ──────────────────────────────────────────────────── -->
+  } @else {
+    <app-deviation-list
+      [deviations]="deviations()"
+      (editClicked)="openEditEditor($event)"
+      (deleteClicked)="requestDelete($event)"
+    />
+  }
+  <!-- ─────────────────────────────────────────────────────────────────────── -->
+
+  <!-- ─── Editor panel overlay ────────────────────────────────────────────── -->
+  @if (isEditorOpen()) {
+    <!-- Backdrop -->
+    <div
+      class="fixed inset-0 z-20 bg-black/40 backdrop-blur-sm"
+      (click)="closeEditor()"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Panel -->
+    <aside
+      class="fixed inset-y-0 right-0 z-30 flex w-full max-w-md flex-col
+             border-l border-gray-200 bg-surface shadow-xl
+             dark:border-gray-700 dark:bg-surface-dark"
+      role="dialog"
+      [attr.aria-label]="editorTitle()"
+    >
+      <!-- Panel header -->
+      <div class="flex items-center justify-between border-b border-gray-200
+                  px-6 py-4 dark:border-gray-700">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+          {{ editorTitle() }}
+        </h3>
+        <button
+          type="button"
+          (click)="closeEditor()"
+          class="rounded-md p-1.5 text-gray-500 transition-colors duration-150
+                 hover:bg-gray-100 hover:text-gray-900
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
+                 dark:hover:bg-gray-700 dark:hover:text-gray-100"
+          aria-label="Close panel"
+        >
+          <svg class="size-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72
+                     3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75
+                     0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0
+                     00-1.06-1.06L10 8.94 6.28 5.22z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form body -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <app-deviation-form
+          [mode]="editorMode()"
+          [initialValue]="editingDeviation()"
+          [isSaving]="isSaving()"
+          (submitted)="onFormSubmitted($event)"
+          (cancelled)="closeEditor()"
+        />
+      </div>
+    </aside>
+  }
+  <!-- ─────────────────────────────────────────────────────────────────────── -->
+
+  <!-- ─── Delete confirmation dialog ──────────────────────────────────────── -->
+  @if (pendingDeleteId()) {
+    <!-- Backdrop -->
+    <div
+      class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Dialog -->
+    <div
+      class="fixed left-1/2 top-1/2 z-50 w-full max-w-sm
+             -translate-x-1/2 -translate-y-1/2
+             rounded-xl border border-gray-200 bg-surface p-6 shadow-xl
+             dark:border-gray-700 dark:bg-surface-dark"
+      role="alertdialog"
+      aria-labelledby="delete-dialog-title"
+      aria-describedby="delete-dialog-desc"
+    >
+      <h4 id="delete-dialog-title"
+          class="text-base font-semibold text-gray-900 dark:text-gray-100">
+        Delete deviation?
+      </h4>
+      <p id="delete-dialog-desc"
+         class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        This action cannot be undone. The deviation will be permanently removed.
+      </p>
+      <div class="mt-5 flex justify-end gap-3">
+        <button
+          type="button"
+          (click)="cancelDelete()"
+          class="rounded-md px-4 py-2 text-sm font-medium text-gray-700
+                 ring-1 ring-gray-300 transition-colors duration-150
+                 hover:bg-gray-50
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
+                 dark:text-gray-300 dark:ring-gray-600 dark:hover:bg-gray-800"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          (click)="confirmDelete()"
+          class="rounded-md bg-danger px-4 py-2 text-sm font-medium text-white
+                 transition-colors duration-150
+                 hover:bg-danger/90
+                 focus-visible:outline-none focus-visible:ring-2
+                 focus-visible:ring-danger focus-visible:ring-offset-2"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  }
+  <!-- ─────────────────────────────────────────────────────────────────────── -->
+
+</section>
