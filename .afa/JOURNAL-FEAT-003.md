@@ -121,3 +121,9 @@ Documented FEAT-003 by updating README.md and CHANGELOG.md to reflect the implem
 
 ---
 
+## [WriterAgent] 2026-04-27 16:19:48 UTC
+
+Chose PR title format '[FEAT-003] Employee Competence Profile' to keep it aligned to the task ID and original title. Framed the description around the implemented employee profile competency feature and the verified security hardening/authz changes without overstating any unconfirmed scope.
+
+---
+
