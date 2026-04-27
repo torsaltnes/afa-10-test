@@ -37,6 +37,7 @@ app.UseCors();
 app.MapHealthEndpoints();
 app.MapHealthChecks("/health/live");
 app.MapDeviationEndpoints();
+app.MapProfileEndpoints();
 
 app.Run();
 

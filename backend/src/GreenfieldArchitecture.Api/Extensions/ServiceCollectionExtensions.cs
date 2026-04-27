@@ -2,8 +2,12 @@ using GreenfieldArchitecture.Application.Abstractions.Health;
 using GreenfieldArchitecture.Application.Deviations.Abstractions;
 using GreenfieldArchitecture.Application.Deviations.Services;
 using GreenfieldArchitecture.Application.Health.Services;
+using GreenfieldArchitecture.Application.Profile.Abstractions;
+using GreenfieldArchitecture.Application.Profile.Services;
 using GreenfieldArchitecture.Infrastructure.Deviations.Repositories;
 using GreenfieldArchitecture.Infrastructure.Health;
+using GreenfieldArchitecture.Infrastructure.Profile;
+using GreenfieldArchitecture.Infrastructure.Profile.Repositories;
 using System.Reflection;
 
 namespace GreenfieldArchitecture.Api.Extensions;
@@ -44,6 +48,11 @@ public static class ServiceCollectionExtensions
         // Deviations — repository is singleton (in-memory store must outlive request scopes)
         services.AddSingleton<IDeviationRepository, InMemoryDeviationRepository>();
         services.AddScoped<IDeviationService, DeviationService>();
+
+        // Profile — repository is singleton (in-memory store must outlive request scopes)
+        services.AddSingleton<IEmployeeCompetenceProfileRepository, InMemoryEmployeeCompetenceProfileRepository>();
+        services.AddSingleton<ICurrentUserContext, StaticCurrentUserContext>();
+        services.AddScoped<IEmployeeCompetenceProfileService, EmployeeCompetenceProfileService>();
 
         return services;
     }

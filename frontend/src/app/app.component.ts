@@ -56,6 +56,17 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
             >
               Deviations
             </a>
+            <a
+              routerLink="/my-profile"
+              routerLinkActive="bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+              class="rounded-md px-3 py-1.5 text-sm font-medium text-gray-600
+                     transition-colors duration-150
+                     hover:bg-gray-100 hover:text-gray-900
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
+                     dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+            >
+              My Profile
+            </a>
           </nav>
 
         </div>

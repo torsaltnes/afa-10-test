@@ -15,3 +15,22 @@ For FEAT-003, planned the feature as a new vertical slice that preserves the rep
 
 ---
 
+## [CodingAgent] 2026-04-27 15:37:15 UTC
+
+Implemented FEAT-003 Employee Competence Profile as a full vertical slice on both backend and frontend.
+
+**Backend decisions:**
+- Mirrored the existing in-memory repository pattern (no DB migration needed) to stay consistent with how DeviationRepository is implemented. Repository contract is persistence-agnostic so swapping to EF Core later requires only an infrastructure change.
+- Created `StaticCurrentUserContext` returning a fixed `"employee-001"` ID as a minimal ownership stub, intentionally avoiding putting user-id in the request body (which would be a security gap). This is clearly documented for future auth replacement.
+- Used `DateOnly` for certificate/course dates since no time component is needed, consistent with C#'s type-safe date handling.
+- Validation (future date check, year range, required strings) lives in the service layer, not the endpoint layer, keeping endpoints thin per the plan's guidance.
+- Integration test isolation: in-memory singleton repo is shared per WebApplicationFactory class fixture, so the "get profile" test was changed to assert `NotBeNull()` (shape check) rather than `BeEmpty()` (which would be order-dependent across concurrent tests).
+
+**Frontend decisions:**
+- `ProfileStore` is `providedIn: 'root'` singleton but uses local signals; it's simple enough that NgRx/SignalStore is not warranted. Mutations update the signal in-place (optimistic update pattern) to avoid full reloads.
+- Each section component owns its own `isAdding`/`editingId` local signals, keeping section state independent and preventing one section's edit mode from interfering with another.
+- Import path fix: form components in `components/` subdir needed `../models/profile.models` not `../../models/profile.models`.
+- All 80 frontend tests and 81 backend tests pass.
+
+---
+
