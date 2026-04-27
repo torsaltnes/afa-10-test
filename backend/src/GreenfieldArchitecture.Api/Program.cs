@@ -14,10 +14,18 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthEndpoints();
 app.MapHealthChecks("/health/live");
+app.MapDeviationEndpoints();
 
 app.Run();
 
