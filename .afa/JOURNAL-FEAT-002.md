@@ -63,3 +63,15 @@ Verified backend build and tests passed, frontend install/build and headless tes
 
 ---
 
+## [ReviewAgent] 2026-04-29 22:36:06 UTC
+
+Reviewed the API surface, deviation service, and in-memory repository after dependency audit. No critical OWASP findings: input strings are trimmed/validated at command boundaries, attachment payloads are size-limited before and after base64 decode, CSV export neutralizes formula injection, and the sandbox has no filesystem or external persistence paths that would make the attachment fields dangerous. Accepted remaining risks as sandbox-appropriate (no auth/CSRF hardening, in-memory storage).
+
+---
+
+## [DocAgent] 2026-04-29 22:37:48 UTC
+
+Oppdaterte README.md og CHANGELOG.md med faktiske FEAT-002-endringer fra journalen: dokumenterte deviations-funksjonen, de lazy-loadede frontend-rutene og de utvidede /api/deviations-endepunktene, og la inn sikkerhetsrettingene for CSV-injeksjon, vedleggsgrense og inputvalidering. Valgte å beskrive backend som Minimal API fordi det samsvarer med implementasjonen, selv om kravteksten nevnte controller.
+
+---
+
