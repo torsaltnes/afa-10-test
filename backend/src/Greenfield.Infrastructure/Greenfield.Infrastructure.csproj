@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Greenfield.Infrastructure</RootNamespace>
+    <AssemblyName>Greenfield.Infrastructure</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Grants access to ASP.NET Core types (HealthCheckService, IWebHostEnvironment, etc.)
+       without forcing the Web SDK on this library project. -->
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Greenfield.Application\Greenfield.Application.csproj" />
+  </ItemGroup>
+</Project>

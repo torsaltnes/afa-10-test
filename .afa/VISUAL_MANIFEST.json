@@ -1,0 +1,142 @@
+{
+  "layout": {
+    "type": "grid",
+    "direction": "row",
+    "children": [
+      {
+        "id": "sidebar",
+        "type": "flex",
+        "direction": "column",
+        "role": "navigation",
+        "widthApprox": "240px",
+        "children": [
+          { "id": "logo-area", "type": "flex", "direction": "row" },
+          { "id": "nav-links", "type": "flex", "direction": "column" },
+          { "id": "user-profile", "type": "flex", "direction": "row" }
+        ]
+      },
+      {
+        "id": "main-panel",
+        "type": "flex",
+        "direction": "column",
+        "children": [
+          { "id": "topbar", "type": "flex", "direction": "row" },
+          {
+            "id": "content-area",
+            "type": "grid",
+            "direction": "row",
+            "children": [
+              { "id": "metrics-row", "type": "grid", "columns": 4, "direction": "row" },
+              { "id": "charts-row", "type": "grid", "columns": 2, "direction": "row" },
+              { "id": "table-section", "type": "flex", "direction": "column" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "components": [
+    { "type": "nav", "label": "Sidebar Navigation", "role": "primary-nav" },
+    { "type": "logo", "label": "App Logo / Brand", "position": "sidebar-top" },
+    { "type": "nav-item", "label": "Dashboard", "state": "active" },
+    { "type": "nav-item", "label": "Analytics" },
+    { "type": "nav-item", "label": "Reports" },
+    { "type": "nav-item", "label": "Users" },
+    { "type": "nav-item", "label": "Settings" },
+    { "type": "topbar", "label": "Header Bar", "position": "top" },
+    { "type": "input", "label": "Search", "placeholder": "Search…" },
+    { "type": "button", "label": "Notifications", "icon": "bell" },
+    { "type": "avatar", "label": "User Avatar", "position": "topbar-right" },
+    { "type": "card", "label": "Metric Card – Total Users" },
+    { "type": "card", "label": "Metric Card – Revenue" },
+    { "type": "card", "label": "Metric Card – Active Sessions" },
+    { "type": "card", "label": "Metric Card – Conversion Rate" },
+    { "type": "chart", "chartType": "line", "label": "Traffic Over Time" },
+    { "type": "chart", "chartType": "bar", "label": "Revenue Breakdown" },
+    { "type": "table", "label": "Recent Activity / Data Table" },
+    { "type": "badge", "label": "Status Badge", "variants": ["success", "warning", "danger"] },
+    { "type": "button", "label": "Export", "variant": "secondary" },
+    { "type": "button", "label": "Add New", "variant": "primary" },
+    { "type": "dropdown", "label": "Date Range Filter" },
+    { "type": "pagination", "label": "Table Pagination" }
+  ],
+  "textContent": [
+    "Dashboard",
+    "Analytics",
+    "Reports",
+    "Users",
+    "Settings",
+    "Search…",
+    "Total Users",
+    "Revenue",
+    "Active Sessions",
+    "Conversion Rate",
+    "Traffic Over Time",
+    "Revenue Breakdown",
+    "Recent Activity",
+    "Export",
+    "Add New",
+    "Last 30 days",
+    "Status",
+    "Name",
+    "Date",
+    "Amount",
+    "Actions"
+  ],
+  "styles": {
+    "colors": [
+      "--color-primary: oklch(0.62 0.19 264)",
+      "--color-primary-hover: oklch(0.55 0.21 264)",
+      "--color-surface: oklch(0.18 0.02 264)",
+      "--color-surface-raised: oklch(0.22 0.02 264)",
+      "--color-surface-overlay: oklch(0.26 0.025 264)",
+      "--color-background: oklch(0.13 0.015 264)",
+      "--color-text-primary: oklch(0.94 0.005 264)",
+      "--color-text-secondary: oklch(0.65 0.01 264)",
+      "--color-border: oklch(0.30 0.02 264)",
+      "--color-success: oklch(0.72 0.17 145)",
+      "--color-warning: oklch(0.78 0.17 75)",
+      "--color-danger: oklch(0.65 0.22 25)",
+      "--color-chart-1: oklch(0.62 0.19 264)",
+      "--color-chart-2: oklch(0.72 0.17 145)",
+      "--color-chart-3: oklch(0.78 0.17 75)"
+    ],
+    "spacingScale": "normal",
+    "borderRadius": "md",
+    "fontFamily": "Inter, 'Geist', system-ui, sans-serif",
+    "fontSizeHierarchy": {
+      "display": "2rem",
+      "heading": "1.25rem",
+      "subheading": "1rem",
+      "body": "0.875rem",
+      "caption": "0.75rem"
+    },
+    "themeMode": "dark"
+  },
+  "responsiveStrategy": {
+    "breakpoints": {
+      "mobile": "< 768px",
+      "tablet": "768px – 1024px",
+      "desktop": "> 1024px"
+    },
+    "mobileAdaptations": [
+      "Sidebar collapses to bottom tab-bar or hamburger drawer",
+      "4-column metrics grid reduces to 2-column or single-column stack",
+      "Charts stack vertically (single column)",
+      "Table scrolls horizontally or switches to card-list view",
+      "Topbar search icon-only; expands on tap"
+    ]
+  },
+  "metadata": {
+    "imageWidth": 1440,
+    "imageHeight": 900,
+    "analyzedBy": "claude-sonnet-4.6",
+    "confidence": 0.78,
+    "analyzedAt": "2026-04-29T20:58:17.527Z",
+    "userPreferences": {
+      "themeMode": "dark",
+      "appliedToAnalysis": true
+    },
+    "notes": "Dark theme confirmed and consistent with user preference. Colors estimated in oklch() for perceptual uniformity. Sidebar + main-panel two-column root grid is the dominant structural pattern."
+  }
+}

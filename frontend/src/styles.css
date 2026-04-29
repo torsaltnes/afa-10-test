@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@source "./src/**/*.ts";
+
+@theme {
+  /* ── Brand colours ─────────────────────────────────────────── */
+  --color-primary:          oklch(0.62 0.19 264);
+  --color-primary-hover:    oklch(0.55 0.21 264);
+
+  /* ── Surface hierarchy ──────────────────────────────────────── */
+  --color-background:       oklch(0.13 0.015 264);
+  --color-surface:          oklch(0.18 0.02 264);
+  --color-surface-raised:   oklch(0.22 0.02 264);
+  --color-surface-overlay:  oklch(0.26 0.025 264);
+
+  /* ── Typography colours ─────────────────────────────────────── */
+  --color-text-primary:     oklch(0.94 0.005 264);
+  --color-text-secondary:   oklch(0.65 0.01 264);
+
+  /* ── Semantic / UI colours ──────────────────────────────────── */
+  --color-border:           oklch(0.30 0.02 264);
+  --color-success:          oklch(0.72 0.17 145);
+  --color-warning:          oklch(0.78 0.17 75);
+  --color-danger:           oklch(0.65 0.22 25);
+
+  /* ── Chart colours ──────────────────────────────────────────── */
+  --color-chart-1:          oklch(0.62 0.19 264);
+  --color-chart-2:          oklch(0.72 0.17 145);
+  --color-chart-3:          oklch(0.78 0.17 75);
+
+  /* ── Typography scale ───────────────────────────────────────── */
+  --text-display:    2rem;
+  --text-heading:    1.25rem;
+  --text-subheading: 1rem;
+  --text-body:       0.875rem;
+  --text-caption:    0.75rem;
+
+  /* ── Font family ────────────────────────────────────────────── */
+  --font-sans: Inter, 'Geist', system-ui, sans-serif;
+}
+
+/* ── Base defaults ──────────────────────────────────────────── */
+html,
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  margin: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
