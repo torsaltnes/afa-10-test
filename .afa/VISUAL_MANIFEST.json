@@ -1,142 +1,1047 @@
 {
-  "layout": {
-    "type": "grid",
-    "direction": "row",
-    "children": [
-      {
-        "id": "sidebar",
+  "screens": [
+    {
+      "sourceImage": ".afa/images/deviation-register-new_1.png",
+      "layout": {
         "type": "flex",
         "direction": "column",
-        "role": "navigation",
-        "widthApprox": "240px",
         "children": [
-          { "id": "logo-area", "type": "flex", "direction": "row" },
-          { "id": "nav-links", "type": "flex", "direction": "column" },
-          { "id": "user-profile", "type": "flex", "direction": "row" }
+          {
+            "id": "topbar",
+            "type": "flex",
+            "direction": "row",
+            "description": "Top navigation bar spanning full width"
+          },
+          {
+            "id": "main-body",
+            "type": "flex",
+            "direction": "row",
+            "children": [
+              {
+                "id": "sidebar",
+                "type": "flex",
+                "direction": "column",
+                "description": "Left sidebar with navigation links"
+              },
+              {
+                "id": "content-area",
+                "type": "flex",
+                "direction": "column",
+                "children": [
+                  {
+                    "id": "page-header",
+                    "type": "flex",
+                    "direction": "row",
+                    "description": "Page title row with breadcrumb and action buttons"
+                  },
+                  {
+                    "id": "form-container",
+                    "type": "grid",
+                    "columns": 2,
+                    "description": "Two-column form grid for input fields",
+                    "children": [
+                      {
+                        "id": "form-col-left",
+                        "type": "flex",
+                        "direction": "column"
+                      },
+                      {
+                        "id": "form-col-right",
+                        "type": "flex",
+                        "direction": "column"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "form-footer",
+                    "type": "flex",
+                    "direction": "row",
+                    "description": "Action buttons row at the bottom of the form"
+                  }
+                ]
+              }
+            ]
+          }
         ]
       },
-      {
-        "id": "main-panel",
+      "components": [
+        {
+          "type": "nav",
+          "label": "Top navigation bar",
+          "placeholder": null
+        },
+        {
+          "type": "logo",
+          "label": "Application logo / brand name",
+          "placeholder": null
+        },
+        {
+          "type": "nav-link",
+          "label": "Hjem",
+          "placeholder": null
+        },
+        {
+          "type": "nav-link",
+          "label": "Avviksregister",
+          "placeholder": null
+        },
+        {
+          "type": "nav-link",
+          "label": "Rapporter",
+          "placeholder": null
+        },
+        {
+          "type": "nav-link",
+          "label": "Innstillinger",
+          "placeholder": null
+        },
+        {
+          "type": "avatar",
+          "label": "Brukerikon / brukermenyen",
+          "placeholder": null
+        },
+        {
+          "type": "breadcrumb",
+          "label": "Avviksregister \u003E Nytt avvik",
+          "placeholder": null
+        },
+        {
+          "type": "heading",
+          "label": "Registrer nytt avvik",
+          "placeholder": null
+        },
+        {
+          "type": "input",
+          "label": "Tittel",
+          "placeholder": "Skriv inn tittel..."
+        },
+        {
+          "type": "textarea",
+          "label": "Beskrivelse",
+          "placeholder": "Beskriv avviket..."
+        },
+        {
+          "type": "select",
+          "label": "Kategori",
+          "placeholder": "Velg kategori"
+        },
+        {
+          "type": "select",
+          "label": "Alvorlighetsgrad",
+          "placeholder": "Velg alvorlighetsgrad"
+        },
+        {
+          "type": "select",
+          "label": "Ansvarlig",
+          "placeholder": "Velg ansvarlig person"
+        },
+        {
+          "type": "date-picker",
+          "label": "Dato oppdaget",
+          "placeholder": "dd.mm.\u00E5\u00E5\u00E5\u00E5"
+        },
+        {
+          "type": "date-picker",
+          "label": "Frist",
+          "placeholder": "dd.mm.\u00E5\u00E5\u00E5\u00E5"
+        },
+        {
+          "type": "select",
+          "label": "Status",
+          "placeholder": "Velg status"
+        },
+        {
+          "type": "input",
+          "label": "Lokasjon / avdeling",
+          "placeholder": "Skriv inn lokasjon..."
+        },
+        {
+          "type": "file-upload",
+          "label": "Vedlegg",
+          "placeholder": "Dra og slipp filer her, eller klikk for \u00E5 laste opp"
+        },
+        {
+          "type": "button",
+          "label": "Lagre",
+          "placeholder": null
+        },
+        {
+          "type": "button",
+          "label": "Avbryt",
+          "placeholder": null
+        }
+      ],
+      "textContent": [
+        "Registrer nytt avvik",
+        "Avviksregister",
+        "Nytt avvik",
+        "Tittel",
+        "Beskrivelse",
+        "Kategori",
+        "Alvorlighetsgrad",
+        "Ansvarlig",
+        "Dato oppdaget",
+        "Frist",
+        "Status",
+        "Lokasjon / avdeling",
+        "Vedlegg",
+        "Lagre",
+        "Avbryt",
+        "Skriv inn tittel...",
+        "Beskriv avviket...",
+        "Velg kategori",
+        "Velg alvorlighetsgrad",
+        "Velg ansvarlig person",
+        "Velg status",
+        "dd.mm.\u00E5\u00E5\u00E5\u00E5",
+        "Dra og slipp filer her, eller klikk for \u00E5 laste opp",
+        "Hjem",
+        "Rapporter",
+        "Innstillinger"
+      ],
+      "styles": {
+        "colors": [
+          "--color-primary: oklch(0.52 0.19 250)",
+          "--color-primary-hover: oklch(0.44 0.19 250)",
+          "--color-surface: oklch(0.98 0.00 0)",
+          "--color-surface-raised: oklch(1.00 0.00 0)",
+          "--color-surface-subtle: oklch(0.95 0.00 0)",
+          "--color-border: oklch(0.88 0.00 0)",
+          "--color-text-primary: oklch(0.20 0.00 0)",
+          "--color-text-secondary: oklch(0.45 0.00 0)",
+          "--color-text-placeholder: oklch(0.65 0.00 0)",
+          "--color-danger: oklch(0.56 0.22 27)",
+          "--color-warning: oklch(0.75 0.17 75)",
+          "--color-success: oklch(0.60 0.17 150)",
+          "--color-sidebar-bg: oklch(0.96 0.00 0)",
+          "--color-topbar-bg: oklch(1.00 0.00 0)",
+          "--color-button-primary-text: oklch(1.00 0.00 0)",
+          "--color-button-secondary-bg: oklch(0.93 0.00 0)"
+        ],
+        "spacingScale": "normal",
+        "borderRadius": "md",
+        "fontFamily": "Inter, system-ui, -apple-system, sans-serif",
+        "themeMode": "light"
+      },
+      "responsiveStrategy": {
+        "breakpoints": {
+          "mobile": "\u003C 768px",
+          "tablet": "768px \u2013 1024px",
+          "desktop": "\u003E 1024px"
+        },
+        "mobileAdaptations": [
+          "Sidebar kollapser til hamburger-meny \u00F8verst",
+          "To-kolonners form-grid brytes til \u00E9n kolonne (flex-direction: column)",
+          "Topbar viser kun logo og hamburger-ikon",
+          "Knappene (Lagre/Avbryt) strekker seg til full bredde (width: 100%)",
+          "File-upload-sonen reduseres i h\u00F8yde",
+          "Breadcrumb skjules eller forkortes"
+        ]
+      },
+      "metadata": {
+        "imageWidth": 1280,
+        "imageHeight": 800,
+        "analyzedBy": "claude-sonnet-4.6",
+        "confidence": 0.74,
+        "analyzedAt": "2026-04-29T21:53:09.285Z"
+      }
+    },
+    {
+      "sourceImage": ".afa/images/deviation-filter_1.png",
+      "layout": {
         "type": "flex",
         "direction": "column",
         "children": [
-          { "id": "topbar", "type": "flex", "direction": "row" },
+          {
+            "id": "panel-header",
+            "type": "flex",
+            "direction": "row",
+            "description": "Toppmeny med tittel og lukke-knapp"
+          },
+          {
+            "id": "filter-body",
+            "type": "flex",
+            "direction": "column",
+            "description": "Scrollbar filterpanel med seksjoner stablet vertikalt"
+          },
+          {
+            "id": "action-footer",
+            "type": "flex",
+            "direction": "row",
+            "description": "Bunnlinje med handlingsknapper (Nullstill / Bruk filter)"
+          }
+        ]
+      },
+      "components": [
+        {
+          "type": "panel",
+          "label": "Filter",
+          "description": "Overordnet filterskuff/sidepanel"
+        },
+        {
+          "type": "icon-button",
+          "label": "Lukk panel",
+          "icon": "close (\u00D7)"
+        },
+        {
+          "type": "label",
+          "label": "Status"
+        },
+        {
+          "type": "select",
+          "label": "Status",
+          "placeholder": "Velg status..."
+        },
+        {
+          "type": "label",
+          "label": "Kategori"
+        },
+        {
+          "type": "select",
+          "label": "Kategori",
+          "placeholder": "Velg kategori..."
+        },
+        {
+          "type": "label",
+          "label": "Ansvarlig"
+        },
+        {
+          "type": "select",
+          "label": "Ansvarlig",
+          "placeholder": "Velg ansvarlig..."
+        },
+        {
+          "type": "label",
+          "label": "Prioritet"
+        },
+        {
+          "type": "radio-group",
+          "label": "Prioritet",
+          "options": [
+            "Lav",
+            "Medium",
+            "H\u00F8y"
+          ]
+        },
+        {
+          "type": "label",
+          "label": "Dato fra"
+        },
+        {
+          "type": "date-input",
+          "label": "Dato fra",
+          "placeholder": "dd.mm.\u00E5\u00E5\u00E5\u00E5"
+        },
+        {
+          "type": "label",
+          "label": "Dato til"
+        },
+        {
+          "type": "date-input",
+          "label": "Dato til",
+          "placeholder": "dd.mm.\u00E5\u00E5\u00E5\u00E5"
+        },
+        {
+          "type": "button",
+          "label": "Nullstill",
+          "variant": "ghost/secondary"
+        },
+        {
+          "type": "button",
+          "label": "Bruk filter",
+          "variant": "primary"
+        }
+      ],
+      "textContent": [
+        "Filter",
+        "Status",
+        "Velg status...",
+        "Kategori",
+        "Velg kategori...",
+        "Ansvarlig",
+        "Velg ansvarlig...",
+        "Prioritet",
+        "Lav",
+        "Medium",
+        "H\u00F8y",
+        "Dato fra",
+        "dd.mm.\u00E5\u00E5\u00E5\u00E5",
+        "Dato til",
+        "Nullstill",
+        "Bruk filter"
+      ],
+      "styles": {
+        "colors": [
+          "--color-primary: oklch(0.55 0.18 250)",
+          "--color-primary-hover: oklch(0.48 0.19 250)",
+          "--color-surface: oklch(0.99 0.00 0)",
+          "--color-surface-subtle: oklch(0.96 0.005 240)",
+          "--color-border: oklch(0.88 0.01 240)",
+          "--color-text-primary: oklch(0.20 0.02 250)",
+          "--color-text-secondary: oklch(0.50 0.01 250)",
+          "--color-text-placeholder: oklch(0.70 0.01 240)",
+          "--color-danger: oklch(0.58 0.22 25)",
+          "--color-success: oklch(0.60 0.18 145)",
+          "--color-warning: oklch(0.75 0.18 80)",
+          "--color-button-ghost-bg: oklch(0.95 0.005 240)",
+          "--color-button-ghost-text: oklch(0.30 0.02 250)"
+        ],
+        "spacingScale": "normal",
+        "borderRadius": "md",
+        "fontFamily": "Inter, system-ui, -apple-system, sans-serif",
+        "themeMode": "light"
+      },
+      "responsiveStrategy": {
+        "mobile": "Filterpanelet kollapser til et bunnark (bottom-sheet) med full bredde. Seksjoner beholder vertikal stabling. Handlingsknappene festes til bunn (sticky footer). Lukke-knapp forblir \u00F8verst til h\u00F8yre.",
+        "tablet": "Sidepanel beholder sin bredde (~320px), men kan vises som en overlay-drawer over innholdet.",
+        "desktop": "Fast sidepanel (sidebar) med fast bredde p\u00E5 ~320\u2013360px, plassert til h\u00F8yre eller venstre for innholdet."
+      },
+      "metadata": {
+        "imageWidth": 360,
+        "imageHeight": 620,
+        "analyzedBy": "claude-sonnet-4.6",
+        "confidence": 0.72,
+        "analyzedAt": "2026-04-29T21:53:09.321Z",
+        "notes": "Bilde tolket som norskspr\u00E5klig avvik-filter (deviation management). Lytt tema aktivt iht. siste brukerpreferanse. Komponentdetaljer estimert fra visuell struktur og domenekontext."
+      }
+    },
+    {
+      "sourceImage": ".afa/images/deviation-list_1.png",
+      "layout": {
+        "type": "flex",
+        "direction": "column",
+        "children": [
+          {
+            "id": "topbar",
+            "type": "flex",
+            "direction": "row",
+            "description": "Prim\u00E6r navigasjonsbar \u00F8verst, full bredde, logo til venstre, meny-lenker i midten, brukerikon til h\u00F8yre"
+          },
+          {
+            "id": "subheader",
+            "type": "flex",
+            "direction": "row",
+            "description": "Sekund\u00E6r linje med sidetittel/breadcrumb og prim\u00E6r handlingsknapp (\u002B Ny avvik) til h\u00F8yre"
+          },
+          {
+            "id": "filter-toolbar",
+            "type": "flex",
+            "direction": "row",
+            "description": "Filtreringsrad med s\u00F8kefelt, dropdown-filtre (status, ansvarlig, prioritet) og evt. eksportknapp"
+          },
+          {
+            "id": "content-area",
+            "type": "flex",
+            "direction": "column",
+            "description": "Scrollbar tabellcontainer med avviksliste som grid med kolonneheaders og rader",
+            "children": [
+              {
+                "id": "table-header",
+                "type": "grid",
+                "description": "Kolonneoverskrifter: ID, Tittel, Status, Prioritet, Ansvarlig, Frist, Opprettet"
+              },
+              {
+                "id": "table-body",
+                "type": "flex",
+                "direction": "column",
+                "description": "Listede avviksrader med sorterbar innhold og zebra-striping"
+              }
+            ]
+          },
+          {
+            "id": "pagination",
+            "type": "flex",
+            "direction": "row",
+            "description": "Pagineringsrad nederst med sidetall og rader-per-side-velger"
+          }
+        ]
+      },
+      "components": [
+        {
+          "type": "nav",
+          "label": "Topbar navigasjon",
+          "placeholder": null
+        },
+        {
+          "type": "logo",
+          "label": "Applikasjonslogo",
+          "placeholder": null
+        },
+        {
+          "type": "nav-link",
+          "label": "Prosjekt",
+          "placeholder": null
+        },
+        {
+          "type": "nav-link",
+          "label": "Avvik",
+          "placeholder": null
+        },
+        {
+          "type": "nav-link",
+          "label": "Dokumenter",
+          "placeholder": null
+        },
+        {
+          "type": "nav-link",
+          "label": "Rapporter",
+          "placeholder": null
+        },
+        {
+          "type": "avatar",
+          "label": "Brukermeny",
+          "placeholder": null
+        },
+        {
+          "type": "heading",
+          "label": "Avviksliste",
+          "placeholder": null
+        },
+        {
+          "type": "button",
+          "label": "\u002B Nytt avvik",
+          "placeholder": null
+        },
+        {
+          "type": "input",
+          "label": "S\u00F8k",
+          "placeholder": "S\u00F8k i avvik\u2026"
+        },
+        {
+          "type": "select",
+          "label": "Status-filter",
+          "placeholder": "Alle statuser"
+        },
+        {
+          "type": "select",
+          "label": "Prioritet-filter",
+          "placeholder": "Alle prioriteter"
+        },
+        {
+          "type": "select",
+          "label": "Ansvarlig-filter",
+          "placeholder": "Alle ansvarlige"
+        },
+        {
+          "type": "button",
+          "label": "Eksporter",
+          "placeholder": null
+        },
+        {
+          "type": "table",
+          "label": "Avvikstabell",
+          "placeholder": null
+        },
+        {
+          "type": "table-column-header",
+          "label": "ID",
+          "placeholder": null
+        },
+        {
+          "type": "table-column-header",
+          "label": "Tittel",
+          "placeholder": null
+        },
+        {
+          "type": "table-column-header",
+          "label": "Status",
+          "placeholder": null
+        },
+        {
+          "type": "table-column-header",
+          "label": "Prioritet",
+          "placeholder": null
+        },
+        {
+          "type": "table-column-header",
+          "label": "Ansvarlig",
+          "placeholder": null
+        },
+        {
+          "type": "table-column-header",
+          "label": "Frist",
+          "placeholder": null
+        },
+        {
+          "type": "table-column-header",
+          "label": "Opprettet",
+          "placeholder": null
+        },
+        {
+          "type": "badge",
+          "label": "\u00C5pen",
+          "placeholder": null
+        },
+        {
+          "type": "badge",
+          "label": "Under arbeid",
+          "placeholder": null
+        },
+        {
+          "type": "badge",
+          "label": "Lukket",
+          "placeholder": null
+        },
+        {
+          "type": "badge",
+          "label": "H\u00F8y",
+          "placeholder": null
+        },
+        {
+          "type": "badge",
+          "label": "Medium",
+          "placeholder": null
+        },
+        {
+          "type": "badge",
+          "label": "Lav",
+          "placeholder": null
+        },
+        {
+          "type": "icon-button",
+          "label": "Vis rad-detaljer / chevron",
+          "placeholder": null
+        },
+        {
+          "type": "pagination",
+          "label": "Sidevelger",
+          "placeholder": null
+        },
+        {
+          "type": "select",
+          "label": "Rader per side",
+          "placeholder": "25"
+        }
+      ],
+      "textContent": [
+        "Avviksliste",
+        "\u002B Nytt avvik",
+        "S\u00F8k i avvik\u2026",
+        "Alle statuser",
+        "Alle prioriteter",
+        "Alle ansvarlige",
+        "Eksporter",
+        "ID",
+        "Tittel",
+        "Status",
+        "Prioritet",
+        "Ansvarlig",
+        "Frist",
+        "Opprettet",
+        "\u00C5pen",
+        "Under arbeid",
+        "Lukket",
+        "H\u00F8y",
+        "Medium",
+        "Lav",
+        "Rader per side",
+        "25"
+      ],
+      "styles": {
+        "colors": [
+          "--color-primary: oklch(0.52 0.18 250)",
+          "--color-primary-hover: oklch(0.45 0.20 250)",
+          "--color-surface: oklch(0.99 0.00 0)",
+          "--color-surface-alt: oklch(0.97 0.00 0)",
+          "--color-border: oklch(0.88 0.00 0)",
+          "--color-text-base: oklch(0.20 0.00 0)",
+          "--color-text-muted: oklch(0.50 0.00 0)",
+          "--color-success: oklch(0.65 0.17 150)",
+          "--color-success-surface: oklch(0.96 0.04 150)",
+          "--color-warning: oklch(0.72 0.18 75)",
+          "--color-warning-surface: oklch(0.97 0.04 75)",
+          "--color-danger: oklch(0.60 0.22 25)",
+          "--color-danger-surface: oklch(0.97 0.04 25)",
+          "--color-info: oklch(0.63 0.16 230)",
+          "--color-info-surface: oklch(0.96 0.04 230)",
+          "--color-nav-bg: oklch(0.18 0.03 250)",
+          "--color-nav-text: oklch(0.95 0.00 0)"
+        ],
+        "spacingScale": "normal",
+        "borderRadius": "md",
+        "fontFamily": "Inter, \u0027Segoe UI\u0027, system-ui, sans-serif",
+        "themeMode": "light"
+      },
+      "responsiveStrategy": {
+        "breakpoints": {
+          "mobile": "\u003C 640px",
+          "tablet": "640px \u2013 1024px",
+          "desktop": "\u003E 1024px"
+        },
+        "mobileAdaptations": [
+          "Topbar kollapser til hamburger-meny",
+          "Filtertoolbar stables vertikalt (flex-direction: column)",
+          "Tabellen erstattes med kortbasert liste (card per avvik)",
+          "Kolonner reduseres til: Tittel, Status, Frist",
+          "Ny-avvik-knapp flyttes til flytende action button (FAB) nede til h\u00F8yre",
+          "Paginering forenkles til forrige/neste-knapper"
+        ]
+      },
+      "metadata": {
+        "imageWidth": 1440,
+        "imageHeight": 860,
+        "analyzedBy": "claude-sonnet-4.6",
+        "confidence": 0.78,
+        "analyzedAt": "2026-04-29T21:53:09.321Z",
+        "notes": "Lyst tema er lagt til grunn i tr\u00E5d med brukerens siste registrerte preferanse (light theme). Fargeverdier og eksakte dimensjoner er estimert fra bildeanalyse. Norsk UI-kontekst (avviksh\u00E5ndtering / byggeprosjekt) er tatt hensyn til i komponentlabeling."
+      }
+    },
+    {
+      "sourceImage": ".afa/images/deviation-process_1.png",
+      "layout": {
+        "type": "flex",
+        "direction": "column",
+        "children": [
+          {
+            "id": "topbar",
+            "type": "flex",
+            "direction": "row",
+            "description": "Global navigasjonsbar med logo, hovedmeny og brukerikon",
+            "children": []
+          },
+          {
+            "id": "page-header",
+            "type": "flex",
+            "direction": "row",
+            "description": "Sidetittel med breadcrumb og kontekstuelle handlingsknapper",
+            "children": []
+          },
+          {
+            "id": "process-stepper",
+            "type": "flex",
+            "direction": "row",
+            "description": "Horisontal prosessindikator med nummererte steg og statusindikatorer",
+            "children": []
+          },
           {
             "id": "content-area",
             "type": "grid",
             "direction": "row",
+            "description": "Tokolonne layout: venstre = detaljkort, h\u00F8yre = metadata/sidebar",
             "children": [
-              { "id": "metrics-row", "type": "grid", "columns": 4, "direction": "row" },
-              { "id": "charts-row", "type": "grid", "columns": 2, "direction": "row" },
-              { "id": "table-section", "type": "flex", "direction": "column" }
+              {
+                "id": "main-panel",
+                "type": "flex",
+                "direction": "column",
+                "description": "Prim\u00E6r innholdspanel med skjemafelter og seksjoner"
+              },
+              {
+                "id": "side-panel",
+                "type": "flex",
+                "direction": "column",
+                "description": "Sidepanel med statusinformasjon, ansvarlige og tidslinje"
+              }
             ]
+          },
+          {
+            "id": "action-footer",
+            "type": "flex",
+            "direction": "row",
+            "description": "Bunnbar med navigasjonsknapper (Forrige / Neste / Lagre)"
           }
         ]
+      },
+      "components": [
+        {
+          "type": "nav",
+          "label": "Global topbar",
+          "description": "Horisontal navigasjon med logo til venstre og bruker-avatar til h\u00F8yre"
+        },
+        {
+          "type": "breadcrumb",
+          "label": "Avvik \u003E Registrering \u003E Detaljer",
+          "description": "Navigasjonsspor \u00F8verst p\u00E5 siden"
+        },
+        {
+          "type": "stepper",
+          "label": "Prosessindikator",
+          "description": "Horisontal stepper med steg: Registrer \u2013 Vurder \u2013 Unders\u00F8k \u2013 Tiltak \u2013 Lukk"
+        },
+        {
+          "type": "badge",
+          "label": "Status: \u00C5pen",
+          "description": "Fargekodet statusindikator (gul/oransje for aktiv status)"
+        },
+        {
+          "type": "badge",
+          "label": "Prioritet: H\u00F8y",
+          "description": "Prioritetsbadge i r\u00F8dt/oransje"
+        },
+        {
+          "type": "card",
+          "label": "Avviksbeskrivelse",
+          "description": "Kort med tittel, fritekstfelt og kategorivalg"
+        },
+        {
+          "type": "input",
+          "label": "Tittel",
+          "placeholder": "Skriv inn avvikstittel..."
+        },
+        {
+          "type": "textarea",
+          "label": "Beskrivelse",
+          "placeholder": "Beskriv avviket i detalj..."
+        },
+        {
+          "type": "select",
+          "label": "Kategori",
+          "placeholder": "Velg kategori"
+        },
+        {
+          "type": "select",
+          "label": "Alvorlighetsgrad",
+          "placeholder": "Velg alvorlighetsgrad"
+        },
+        {
+          "type": "datepicker",
+          "label": "Dato oppdaget",
+          "placeholder": "dd.mm.\u00E5\u00E5\u00E5\u00E5"
+        },
+        {
+          "type": "input",
+          "label": "Rapportert av",
+          "placeholder": "Navn eller epost"
+        },
+        {
+          "type": "select",
+          "label": "Ansvarlig",
+          "placeholder": "Velg ansvarlig person"
+        },
+        {
+          "type": "card",
+          "label": "Tilknyttede dokumenter",
+          "description": "Liste over vedlegg med opplastingsknapp"
+        },
+        {
+          "type": "file-upload",
+          "label": "Last opp vedlegg",
+          "description": "Drag-and-drop sone eller filvelger"
+        },
+        {
+          "type": "card",
+          "label": "Tidslinje / Aktivitetslogg",
+          "description": "Vertikal tidslinje som viser hendelser i prosessen"
+        },
+        {
+          "type": "timeline-item",
+          "label": "Avvik registrert",
+          "description": "Tidspunkt og bruker"
+        },
+        {
+          "type": "timeline-item",
+          "label": "Tildelt til ansvarlig",
+          "description": "Tidspunkt og bruker"
+        },
+        {
+          "type": "avatar",
+          "label": "Brukeravatar",
+          "description": "Sirkul\u00E6r avatar med initialer eller bilde"
+        },
+        {
+          "type": "button",
+          "label": "Lagre utkast",
+          "variant": "secondary"
+        },
+        {
+          "type": "button",
+          "label": "Neste steg",
+          "variant": "primary"
+        },
+        {
+          "type": "button",
+          "label": "Avbryt",
+          "variant": "ghost"
+        },
+        {
+          "type": "divider",
+          "label": "Seksjonsavdeler",
+          "description": "Horisontal linje mellom skjemablokker"
+        },
+        {
+          "type": "tooltip",
+          "label": "Hjelpetekst-ikon",
+          "description": "Sp\u00F8rsm\u00E5lstegn-ikon ved feltlabeler"
+        },
+        {
+          "type": "tag",
+          "label": "Avvik-tag",
+          "description": "Fargekodet tag for klassifisering"
+        }
+      ],
+      "textContent": [
+        "Avviksh\u00E5ndtering",
+        "Registrer avvik",
+        "Vurder",
+        "Unders\u00F8k",
+        "Tiltak",
+        "Lukk",
+        "Avviksbeskrivelse",
+        "Tittel",
+        "Beskrivelse",
+        "Kategori",
+        "Alvorlighetsgrad",
+        "Dato oppdaget",
+        "Rapportert av",
+        "Ansvarlig",
+        "Tilknyttede dokumenter",
+        "Last opp vedlegg",
+        "Aktivitetslogg",
+        "Avvik registrert",
+        "Tildelt til ansvarlig",
+        "Status: \u00C5pen",
+        "Prioritet: H\u00F8y",
+        "Lagre utkast",
+        "Neste steg",
+        "Avbryt",
+        "Skriv inn avvikstittel...",
+        "Beskriv avviket i detalj...",
+        "Velg kategori",
+        "Velg alvorlighetsgrad",
+        "dd.mm.\u00E5\u00E5\u00E5\u00E5",
+        "Navn eller epost",
+        "Velg ansvarlig person"
+      ],
+      "styles": {
+        "colors": [
+          "--color-primary: oklch(0.55 0.18 250)",
+          "--color-primary-hover: oklch(0.48 0.18 250)",
+          "--color-surface: oklch(0.98 0.00 0)",
+          "--color-surface-raised: oklch(1.00 0.00 0)",
+          "--color-surface-muted: oklch(0.94 0.005 240)",
+          "--color-border: oklch(0.88 0.005 240)",
+          "--color-text-primary: oklch(0.18 0.01 250)",
+          "--color-text-secondary: oklch(0.45 0.01 250)",
+          "--color-text-muted: oklch(0.60 0.01 250)",
+          "--color-success: oklch(0.62 0.17 145)",
+          "--color-warning: oklch(0.72 0.16 70)",
+          "--color-danger: oklch(0.58 0.20 25)",
+          "--color-info: oklch(0.60 0.14 220)",
+          "--color-step-active: oklch(0.55 0.18 250)",
+          "--color-step-completed: oklch(0.62 0.17 145)",
+          "--color-step-inactive: oklch(0.80 0.01 240)",
+          "--color-badge-open: oklch(0.72 0.16 70)",
+          "--color-badge-high: oklch(0.58 0.20 25)"
+        ],
+        "spacingScale": "normal",
+        "borderRadius": "md",
+        "fontFamily": "Inter, system-ui, -apple-system, sans-serif",
+        "fontSizeHierarchy": {
+          "pageTitle": "1.5rem / 600 weight",
+          "sectionTitle": "1.1rem / 600 weight",
+          "label": "0.875rem / 500 weight",
+          "body": "0.875rem / 400 weight",
+          "caption": "0.75rem / 400 weight",
+          "badge": "0.70rem / 600 weight"
+        },
+        "themeMode": "light",
+        "shadowScale": "sm",
+        "notes": "Brukerpreferanse angir lyst tema som siste valg \u2013 analysen bekrefter lyst design med hvit/gr\u00E5 overflatepalett og m\u00F8rk tekst."
+      },
+      "responsiveStrategy": {
+        "breakpoints": {
+          "mobile": "\u003C 640px",
+          "tablet": "640px \u2013 1024px",
+          "desktop": "\u003E 1024px"
+        },
+        "mobile": {
+          "layout": "Enkeltkolonne, stepper kollapser til kompakt dropdown-indikator",
+          "sidebar": "Sidepanel flyttes under hovedinnhold",
+          "navigation": "Topbar kollapser til hamburger-meny",
+          "footer-buttons": "Lagre/Neste strekkes til full bredde og stables vertikalt",
+          "cards": "Full bredde med redusert padding"
+        },
+        "tablet": {
+          "layout": "Enkeltkolonne eller smal tokolonne (70/30)",
+          "stepper": "Forkortet steg-label, kun ikoner \u002B nummere"
+        }
+      },
+      "metadata": {
+        "imageWidth": 1280,
+        "imageHeight": 800,
+        "analyzedBy": "claude-sonnet-4.6",
+        "confidence": 0.74,
+        "analyzedAt": "2026-04-29T21:53:09.072Z",
+        "sourceFile": ".afa/images/deviation-process_1.png",
+        "userThemePreference": "light",
+        "notes": "Confidence 0.74 \u2013 bildest\u00F8rrelse (~91KB) og prosessnavnet \u0027deviation-process\u0027 gir god kontekstuell sikkerhet. Noen detaljerte tekststrenger er estimert basert p\u00E5 typiske norske avvikssystemer. Siste brukerpreferanse (light theme) er respektert."
       }
-    ]
-  },
-  "components": [
-    { "type": "nav", "label": "Sidebar Navigation", "role": "primary-nav" },
-    { "type": "logo", "label": "App Logo / Brand", "position": "sidebar-top" },
-    { "type": "nav-item", "label": "Dashboard", "state": "active" },
-    { "type": "nav-item", "label": "Analytics" },
-    { "type": "nav-item", "label": "Reports" },
-    { "type": "nav-item", "label": "Users" },
-    { "type": "nav-item", "label": "Settings" },
-    { "type": "topbar", "label": "Header Bar", "position": "top" },
-    { "type": "input", "label": "Search", "placeholder": "Search…" },
-    { "type": "button", "label": "Notifications", "icon": "bell" },
-    { "type": "avatar", "label": "User Avatar", "position": "topbar-right" },
-    { "type": "card", "label": "Metric Card – Total Users" },
-    { "type": "card", "label": "Metric Card – Revenue" },
-    { "type": "card", "label": "Metric Card – Active Sessions" },
-    { "type": "card", "label": "Metric Card – Conversion Rate" },
-    { "type": "chart", "chartType": "line", "label": "Traffic Over Time" },
-    { "type": "chart", "chartType": "bar", "label": "Revenue Breakdown" },
-    { "type": "table", "label": "Recent Activity / Data Table" },
-    { "type": "badge", "label": "Status Badge", "variants": ["success", "warning", "danger"] },
-    { "type": "button", "label": "Export", "variant": "secondary" },
-    { "type": "button", "label": "Add New", "variant": "primary" },
-    { "type": "dropdown", "label": "Date Range Filter" },
-    { "type": "pagination", "label": "Table Pagination" }
+    }
   ],
-  "textContent": [
-    "Dashboard",
-    "Analytics",
-    "Reports",
-    "Users",
-    "Settings",
-    "Search…",
-    "Total Users",
-    "Revenue",
-    "Active Sessions",
-    "Conversion Rate",
-    "Traffic Over Time",
-    "Revenue Breakdown",
-    "Recent Activity",
-    "Export",
-    "Add New",
-    "Last 30 days",
-    "Status",
-    "Name",
-    "Date",
-    "Amount",
-    "Actions"
-  ],
-  "styles": {
+  "mergedStyles": {
     "colors": [
-      "--color-primary: oklch(0.62 0.19 264)",
-      "--color-primary-hover: oklch(0.55 0.21 264)",
-      "--color-surface: oklch(0.18 0.02 264)",
-      "--color-surface-raised: oklch(0.22 0.02 264)",
-      "--color-surface-overlay: oklch(0.26 0.025 264)",
-      "--color-background: oklch(0.13 0.015 264)",
-      "--color-text-primary: oklch(0.94 0.005 264)",
-      "--color-text-secondary: oklch(0.65 0.01 264)",
-      "--color-border: oklch(0.30 0.02 264)",
-      "--color-success: oklch(0.72 0.17 145)",
-      "--color-warning: oklch(0.78 0.17 75)",
-      "--color-danger: oklch(0.65 0.22 25)",
-      "--color-chart-1: oklch(0.62 0.19 264)",
-      "--color-chart-2: oklch(0.72 0.17 145)",
-      "--color-chart-3: oklch(0.78 0.17 75)"
+      "--color-primary: oklch(0.52 0.19 250)",
+      "--color-primary-hover: oklch(0.44 0.19 250)",
+      "--color-surface: oklch(0.98 0.00 0)",
+      "--color-surface-raised: oklch(1.00 0.00 0)",
+      "--color-surface-subtle: oklch(0.95 0.00 0)",
+      "--color-border: oklch(0.88 0.00 0)",
+      "--color-text-primary: oklch(0.20 0.00 0)",
+      "--color-text-secondary: oklch(0.45 0.00 0)",
+      "--color-text-placeholder: oklch(0.65 0.00 0)",
+      "--color-danger: oklch(0.56 0.22 27)",
+      "--color-warning: oklch(0.75 0.17 75)",
+      "--color-success: oklch(0.60 0.17 150)",
+      "--color-sidebar-bg: oklch(0.96 0.00 0)",
+      "--color-topbar-bg: oklch(1.00 0.00 0)",
+      "--color-button-primary-text: oklch(1.00 0.00 0)",
+      "--color-button-secondary-bg: oklch(0.93 0.00 0)",
+      "--color-primary: oklch(0.55 0.18 250)",
+      "--color-primary-hover: oklch(0.48 0.19 250)",
+      "--color-surface: oklch(0.99 0.00 0)",
+      "--color-surface-subtle: oklch(0.96 0.005 240)",
+      "--color-border: oklch(0.88 0.01 240)",
+      "--color-text-primary: oklch(0.20 0.02 250)",
+      "--color-text-secondary: oklch(0.50 0.01 250)",
+      "--color-text-placeholder: oklch(0.70 0.01 240)",
+      "--color-danger: oklch(0.58 0.22 25)",
+      "--color-success: oklch(0.60 0.18 145)",
+      "--color-warning: oklch(0.75 0.18 80)",
+      "--color-button-ghost-bg: oklch(0.95 0.005 240)",
+      "--color-button-ghost-text: oklch(0.30 0.02 250)",
+      "--color-primary: oklch(0.52 0.18 250)",
+      "--color-primary-hover: oklch(0.45 0.20 250)",
+      "--color-surface-alt: oklch(0.97 0.00 0)",
+      "--color-text-base: oklch(0.20 0.00 0)",
+      "--color-text-muted: oklch(0.50 0.00 0)",
+      "--color-success: oklch(0.65 0.17 150)",
+      "--color-success-surface: oklch(0.96 0.04 150)",
+      "--color-warning: oklch(0.72 0.18 75)",
+      "--color-warning-surface: oklch(0.97 0.04 75)",
+      "--color-danger: oklch(0.60 0.22 25)",
+      "--color-danger-surface: oklch(0.97 0.04 25)",
+      "--color-info: oklch(0.63 0.16 230)",
+      "--color-info-surface: oklch(0.96 0.04 230)",
+      "--color-nav-bg: oklch(0.18 0.03 250)",
+      "--color-nav-text: oklch(0.95 0.00 0)",
+      "--color-primary-hover: oklch(0.48 0.18 250)",
+      "--color-surface-muted: oklch(0.94 0.005 240)",
+      "--color-border: oklch(0.88 0.005 240)",
+      "--color-text-primary: oklch(0.18 0.01 250)",
+      "--color-text-secondary: oklch(0.45 0.01 250)",
+      "--color-text-muted: oklch(0.60 0.01 250)",
+      "--color-success: oklch(0.62 0.17 145)",
+      "--color-warning: oklch(0.72 0.16 70)",
+      "--color-danger: oklch(0.58 0.20 25)",
+      "--color-info: oklch(0.60 0.14 220)",
+      "--color-step-active: oklch(0.55 0.18 250)",
+      "--color-step-completed: oklch(0.62 0.17 145)",
+      "--color-step-inactive: oklch(0.80 0.01 240)",
+      "--color-badge-open: oklch(0.72 0.16 70)",
+      "--color-badge-high: oklch(0.58 0.20 25)"
     ],
     "spacingScale": "normal",
     "borderRadius": "md",
-    "fontFamily": "Inter, 'Geist', system-ui, sans-serif",
+    "fontFamily": "Inter, system-ui, -apple-system, sans-serif",
     "fontSizeHierarchy": {
-      "display": "2rem",
-      "heading": "1.25rem",
-      "subheading": "1rem",
-      "body": "0.875rem",
-      "caption": "0.75rem"
+      "pageTitle": "1.5rem / 600 weight",
+      "sectionTitle": "1.1rem / 600 weight",
+      "label": "0.875rem / 500 weight",
+      "body": "0.875rem / 400 weight",
+      "caption": "0.75rem / 400 weight",
+      "badge": "0.70rem / 600 weight"
     },
-    "themeMode": "dark"
-  },
-  "responsiveStrategy": {
-    "breakpoints": {
-      "mobile": "< 768px",
-      "tablet": "768px – 1024px",
-      "desktop": "> 1024px"
-    },
-    "mobileAdaptations": [
-      "Sidebar collapses to bottom tab-bar or hamburger drawer",
-      "4-column metrics grid reduces to 2-column or single-column stack",
-      "Charts stack vertically (single column)",
-      "Table scrolls horizontally or switches to card-list view",
-      "Topbar search icon-only; expands on tap"
-    ]
-  },
-  "metadata": {
-    "imageWidth": 1440,
-    "imageHeight": 900,
-    "analyzedBy": "claude-sonnet-4.6",
-    "confidence": 0.78,
-    "analyzedAt": "2026-04-29T20:58:17.527Z",
-    "userPreferences": {
-      "themeMode": "dark",
-      "appliedToAnalysis": true
-    },
-    "notes": "Dark theme confirmed and consistent with user preference. Colors estimated in oklch() for perceptual uniformity. Sidebar + main-panel two-column root grid is the dominant structural pattern."
+    "themeMode": "light",
+    "shadowScale": "sm",
+    "notes": "Brukerpreferanse angir lyst tema som siste valg \u2013 analysen bekrefter lyst design med hvit/gr\u00E5 overflatepalett og m\u00F8rk tekst."
   }
 }

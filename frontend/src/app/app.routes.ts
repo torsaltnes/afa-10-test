@@ -15,6 +15,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'deviations',
+        loadChildren: () =>
+          import('./features/deviations/deviations.routes').then(
+            (m) => m.deviationsRoutes,
+          ),
+      },
+      {
         path: 'analytics',
         loadComponent: () =>
           import('./features/analytics/analytics.page').then(

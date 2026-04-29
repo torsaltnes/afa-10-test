@@ -9,14 +9,16 @@ interface NavItem {
   label: string;
   route: string;
   icon: string;
+  exact?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard', route: '/', icon: 'dashboard' },
-  { label: 'Analytics', route: '/analytics', icon: 'analytics' },
-  { label: 'Reports', route: '/reports', icon: 'reports' },
-  { label: 'Users', route: '/users', icon: 'users' },
-  { label: 'Settings', route: '/settings', icon: 'settings' },
+  { label: 'Dashboard', route: '/', icon: 'dashboard', exact: true },
+  { label: 'Deviations', route: '/deviations', icon: 'deviations', exact: false },
+  { label: 'Analytics', route: '/analytics', icon: 'analytics', exact: false },
+  { label: 'Reports', route: '/reports', icon: 'reports', exact: false },
+  { label: 'Users', route: '/users', icon: 'users', exact: false },
+  { label: 'Settings', route: '/settings', icon: 'settings', exact: false },
 ];
 
 @Component({
@@ -60,7 +62,7 @@ const NAV_ITEMS: NavItem[] = [
           <a
             [routerLink]="item.route"
             routerLinkActive="bg-surface-raised text-text-primary"
-            [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
             class="flex items-center gap-3 rounded-lg px-3 py-2 text-body
                    text-text-secondary transition-colors duration-150
                    hover:bg-surface-raised hover:text-text-primary
@@ -76,10 +78,16 @@ const NAV_ITEMS: NavItem[] = [
                     <rect x="9" y="9" width="6" height="6" rx="1"/>
                   </svg>
                 }
+                @case ('deviations') {
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2">
+                    <path d="M8 2l6 10H2L8 2z" stroke-linejoin="round"/>
+                    <path d="M8 6v3M8 11h.01" stroke-linecap="round"/>
+                  </svg>
+                }
                 @case ('analytics') {
                   <svg viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M1 14L5 9l3 3 3-4 3-2"/>
-                    <path d="M1 14L5 9l3 3 3-4 3-2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M1 14L5 9l3 3 3-4 3-2" stroke="currentColor" stroke-width="1.5"
+                          fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 }
                 @case ('reports') {

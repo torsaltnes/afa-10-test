@@ -1,3 +1,4 @@
+using Greenfield.Application.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Greenfield.Application.Extensions;
@@ -7,7 +8,7 @@ public static class ApplicationServiceExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Application-layer registrations go here as the feature set grows.
+        services.AddSingleton<IDeviationService, Greenfield.Application.Deviations.DeviationService>();
         return services;
     }
 }

@@ -1,20 +1,22 @@
 # Greenfield
 
-Greenfield er et grønt fullstack-oppsett med en .NET 10 Web API-backend og en Angular 20+ frontend.
+Greenfield er et fullstack-oppsett med en .NET 10 Web API-backend og en Angular 20+ frontend.
 
 ## Teknisk stack
 
 ### Backend
 - .NET 10 / ASP.NET Core
-- Minimal API
+- Minimal APIs
 - OpenAPI
 - CORS
+- In-memory lagring for deviation-flyten
 - Clean Architecture-prosjekter: `Api`, `Application`, `Domain`, `Infrastructure`
 
 ### Frontend
-- Angular 20
-- Standalone Components
+- Angular 20+
+- Standalone Components og lazy-loaded feature routes
 - Signals
+- Reactive Forms
 - RxJS
 - Tailwind CSS v4
 - Chart.js / ng2-charts
@@ -62,7 +64,20 @@ Frontend bruker en dev-proxy fra `/api` til backend på `http://localhost:5000`.
 
 ### Backend
 - `GET /health` – returnerer helsestatus som JSON.
-- Hvis status er `Unhealthy`, returneres `503 Service Unavailable`.
+- `GET /api/deviations` – lister og søker avvik.
+- `GET /api/deviations/{id}` – henter ett avvik.
+- `POST /api/deviations` – registrerer et nytt avvik.
+- `PUT /api/deviations/{id}` – oppdaterer et avvik.
+- `DELETE /api/deviations/{id}` – sletter et avvik.
+- `GET /api/deviations/export` – eksporterer avvik som CSV.
+- `POST /api/deviations/{id}/transition` – flytter et avvik videre i arbeidsflyten.
+- `GET /api/deviations/{id}/timeline` – henter aktivitetslogg.
+- `POST /api/deviations/{id}/comments` – legger til kommentar.
+- `GET /api/deviations/{id}/attachments` – henter vedlegg.
+- `POST /api/deviations/{id}/attachments` – laster opp vedlegg.
+- `DELETE /api/deviations/{id}/attachments/{attachmentId}` – fjerner vedlegg.
 
 ### Frontend
-- I utvikling rutes `/api/*` via `frontend/proxy.conf.json` til backend.
+- `/deviations` – avvikslisten.
+- `/deviations/new` – registreringsskjema for nytt avvik.
+- `/deviations/:id` – behandlings-/detaljside for et avvik.
