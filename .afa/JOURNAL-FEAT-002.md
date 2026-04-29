@@ -75,3 +75,9 @@ Oppdaterte README.md og CHANGELOG.md med faktiske FEAT-002-endringer fra journal
 
 ---
 
+## [WriterAgent] 2026-04-29 22:38:17 UTC
+
+Chose PR title '[FEAT-002] Deviation / Non-conformity management feature' to preserve the original task wording. Framed the description around the backend deviation API hardening and regression coverage, since the delivered changes were limited to backend files even though frontend and end-to-end checks were reported in QA.
+
+---
+
