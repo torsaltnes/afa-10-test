@@ -39,3 +39,21 @@ Verified backend and frontend builds/tests all passed. Backend dotnet build succ
 
 ---
 
+## [ReviewAgent] 2026-04-29 22:26:18 UTC
+
+Rejected because the API exposes attacker-controlled CSV exports without formula neutralization and accepts unbounded base64 attachment payloads stored fully in memory, creating spreadsheet-injection and resource-exhaustion risks. Basic sandbox auth posture was otherwise acceptable, and the remaining gaps were validation robustness issues rather than architectural blockers.
+
+---
+
+## [CodingAgent] 2026-04-29 22:27:29 UTC
+
+Targeted remediation is safer than reworking FEAT-002 broadly: focus on DeviationService and integration tests to close the exact ReviewAgent findings while preserving the existing Minimal API contract. The fixes should centralize CSV formula neutralization, bound attachment payload decoding before materializing bytes in memory, and add null/whitespace validation at the service boundary so bad input becomes 400 responses instead of 500s.
+
+---
+
+## [CodingAgent] 2026-04-29 22:32:35 UTC
+
+Accepted the remediation after independent verification because it closes the concrete rejection paths without changing the public API: user-controlled CSV fields now flow through one helper that prefixes formula-triggering leading characters before RFC4180 escaping, attachment uploads are bounded to a centralized 5 MiB decoded limit with a pre-decode base64 length guard to avoid large allocations, and UpdatedBy/UploadedBy are validated at the service boundary so invalid input returns 400 via existing Minimal API handlers.
+
+---
+

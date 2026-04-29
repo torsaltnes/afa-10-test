@@ -376,4 +376,171 @@ public sealed class DeviationEndpointsTests(WebApplicationFactory<Program> facto
 
         body.Should().StartWith("Id,Title,Status,Severity,Category,ReportedBy");
     }
+
+    // ── Security: CSV formula-injection neutralization ────────────────────
+
+    [Fact]
+    public async Task ExportCsv_FormulaInjectionInTitle_IsPrefixedWithSingleQuote()
+    {
+        // Arrange: create a deviation whose title starts with '=' (formula injection attempt).
+        var injectionTitle = "=HYPERLINK(\"https://evil.example.com\",\"Click\")";
+        var createRequest = new CreateDeviationRequest(
+            Title: injectionTitle,
+            Description: "Security test",
+            Severity: DeviationSeverity.Low,
+            Category: DeviationCategory.Other,
+            ReportedBy: "+AttackerReportedBy");
+
+        var createResponse = await Client.PostAsJsonAsync("/api/deviations", createRequest, JsonOpts);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+
+        // Act: export all deviations to CSV.
+        var exportResponse = await Client.GetAsync("/api/deviations/export");
+        exportResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        var csv = await exportResponse.Content.ReadAsStringAsync();
+
+        // Assert: the exported CSV must neutralize the formula by prepending a single quote.
+        // The title starts with '= → neutralized to '= → then RFC4180-quoted because it contains commas/quotes.
+        csv.Should().Contain("'=HYPERLINK",
+            because: "formula-starting values must be neutralized with a leading single-quote");
+
+        // The ReportedBy field starts with '+' and must also be neutralized.
+        csv.Should().Contain("'+AttackerReportedBy",
+            because: "values starting with '+' must be neutralized with a leading single-quote");
+    }
+
+    [Theory]
+    [InlineData("=SUM(A1:A10)")]
+    [InlineData("+cmd|' /C calc'!A0")]
+    [InlineData("-2+3")]
+    [InlineData("@SUM(1+1)")]
+    public async Task ExportCsv_AllFormulaInjectionPrefixes_AreNeutralized(string attackerValue)
+    {
+        // Arrange: create a deviation with an attacker-controlled title.
+        var createRequest = new CreateDeviationRequest(
+            Title: attackerValue,
+            Description: "Formula injection test",
+            Severity: DeviationSeverity.Low,
+            Category: DeviationCategory.Other,
+            ReportedBy: "security-test@example.com");
+
+        var createResponse = await Client.PostAsJsonAsync("/api/deviations", createRequest, JsonOpts);
+        createResponse.StatusCode.Should().Be(HttpStatusCode.Created);
+        var created = await createResponse.Content.ReadFromJsonAsync<DeviationDto>(JsonOpts);
+
+        // Act: export.
+        var csv = await (await Client.GetAsync("/api/deviations/export")).Content.ReadAsStringAsync();
+
+        // Assert: the neutralized value appears in the CSV (with leading quote).
+        csv.Should().Contain($"'{attackerValue}",
+            because: $"values starting with '{attackerValue[0]}' must be prefixed with a single-quote");
+
+        // Clean up the created deviation so it doesn't affect other tests.
+        await Client.DeleteAsync($"/api/deviations/{created!.Id}");
+    }
+
+    // ── Security: attachment upload size limits ────────────────────────────
+
+    [Fact]
+    public async Task UploadAttachment_OversizedPayload_ReturnsBadRequest()
+    {
+        // Arrange: create base64 content that decodes to more than 5 MiB.
+        // 6 MiB of zeros encodes to ~8 MiB of base64, well above the limit.
+        var oversizedBytes = new byte[6 * 1024 * 1024]; // 6 MiB, all zeros
+        var base64 = Convert.ToBase64String(oversizedBytes);
+
+        var request = new UploadAttachmentRequest(
+            FileName: "oversized.bin",
+            ContentType: "application/octet-stream",
+            Base64Content: base64,
+            UploadedBy: "tester@example.com");
+
+        // Act
+        var response = await Client.PostAsJsonAsync(
+            $"/api/deviations/{DeviationSeedData.Dev005Id}/attachments", request, JsonOpts);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest,
+            because: "attachments that exceed the 5 MiB limit must be rejected with 400");
+    }
+
+    [Fact]
+    public async Task UploadAttachment_ExactlyAtSizeLimit_IsAccepted()
+    {
+        // Arrange: exactly 5 MiB decoded (== limit, should be accepted).
+        var exactBytes = new byte[5 * 1024 * 1024]; // exactly 5 MiB
+        var base64 = Convert.ToBase64String(exactBytes);
+
+        var request = new UploadAttachmentRequest(
+            FileName: "exact-limit.bin",
+            ContentType: "application/octet-stream",
+            Base64Content: base64,
+            UploadedBy: "tester@example.com");
+
+        // Act
+        var response = await Client.PostAsJsonAsync(
+            $"/api/deviations/{DeviationSeedData.Dev002Id}/attachments", request, JsonOpts);
+
+        // Assert: exactly at the limit must be accepted (not rejected).
+        response.StatusCode.Should().Be(HttpStatusCode.Created,
+            because: "an attachment whose decoded size equals the limit exactly should be accepted");
+    }
+
+    // ── Security: invalid base64 ───────────────────────────────────────────
+
+    [Fact]
+    public async Task UploadAttachment_InvalidBase64_ReturnsBadRequest()
+    {
+        var request = new UploadAttachmentRequest(
+            FileName: "bad.txt",
+            ContentType: "text/plain",
+            Base64Content: "this-is-not-valid-base64!!!",
+            UploadedBy: "tester@example.com");
+
+        var response = await Client.PostAsJsonAsync(
+            $"/api/deviations/{DeviationSeedData.Dev005Id}/attachments", request, JsonOpts);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest,
+            because: "invalid base64 content must be rejected with 400");
+    }
+
+    // ── Security: trust-boundary validation (UpdatedBy / UploadedBy) ──────
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task UpdateDeviation_BlankUpdatedBy_ReturnsBadRequest(string updatedBy)
+    {
+        var request = new UpdateDeviationRequest(
+            Title: "Valid title",
+            Description: "Valid description",
+            Severity: DeviationSeverity.Low,
+            Category: DeviationCategory.Other,
+            UpdatedBy: updatedBy);
+
+        var response = await Client.PutAsJsonAsync(
+            $"/api/deviations/{DeviationSeedData.Dev005Id}", request, JsonOpts);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest,
+            because: "a blank UpdatedBy must be rejected at the service boundary with 400");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task UploadAttachment_BlankUploadedBy_ReturnsBadRequest(string uploadedBy)
+    {
+        var content = Convert.ToBase64String("test content"u8.ToArray());
+        var request = new UploadAttachmentRequest(
+            FileName: "test.txt",
+            ContentType: "text/plain",
+            Base64Content: content,
+            UploadedBy: uploadedBy);
+
+        var response = await Client.PostAsJsonAsync(
+            $"/api/deviations/{DeviationSeedData.Dev005Id}/attachments", request, JsonOpts);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest,
+            because: "a blank UploadedBy must be rejected at the service boundary with 400");
+    }
 }

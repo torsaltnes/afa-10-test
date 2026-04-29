@@ -11,6 +11,13 @@ namespace Greenfield.Application.Deviations;
 /// </summary>
 public sealed class DeviationService(IDeviationRepository repository) : IDeviationService
 {
+    // ── Attachment size limit ──────────────────────────────────────────────
+    /// <summary>
+    /// Maximum decoded attachment size accepted by this in-memory sample app (5 MiB).
+    /// Kept as a single constant so all guards in this service stay in sync.
+    /// </summary>
+    private const int MaxAttachmentSizeBytes = 5 * 1024 * 1024; // 5 MiB
+
     // ── Workflow transition table ──────────────────────────────────────────
     private static readonly IReadOnlyDictionary<DeviationStatus, IReadOnlySet<DeviationStatus>>
         ValidTransitions = new Dictionary<DeviationStatus, IReadOnlySet<DeviationStatus>>
@@ -121,6 +128,7 @@ public sealed class DeviationService(IDeviationRepository repository) : IDeviati
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Title);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Description);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.UpdatedBy);
 
         var deviation = await repository.GetByIdAsync(id, ct).ConfigureAwait(false);
         if (deviation is null) return null;
@@ -141,8 +149,8 @@ public sealed class DeviationService(IDeviationRepository repository) : IDeviati
         {
             DeviationId = deviation.Id,
             Type        = ActivityType.Updated,
-            Description = $"Deviation details updated by {request.UpdatedBy}.",
-            PerformedBy = request.UpdatedBy,
+            Description = $"Deviation details updated by {request.UpdatedBy.Trim()}.",
+            PerformedBy = request.UpdatedBy.Trim(),
         });
 
         var saved = await repository.UpdateAsync(deviation, ct).ConfigureAwait(false);
@@ -250,10 +258,23 @@ public sealed class DeviationService(IDeviationRepository repository) : IDeviati
         ArgumentException.ThrowIfNullOrWhiteSpace(request.FileName);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.ContentType);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Base64Content);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.UploadedBy);
+
+        // ── Pre-decode size guard ─────────────────────────────────────────
+        // Base64 encodes every 3 raw bytes as 4 characters.  A base64 string
+        // longer than ⌈MaxAttachmentSizeBytes / 3⌉ × 4 characters cannot
+        // possibly decode to within the allowed limit, so we reject it here
+        // without materialising the byte array.
+        int maxBase64Length = (MaxAttachmentSizeBytes / 3 + 1) * 4;
+        if (request.Base64Content.Length > maxBase64Length)
+            throw new ArgumentException(
+                $"Attachment exceeds the maximum allowed size of {MaxAttachmentSizeBytes / (1024 * 1024)} MiB.",
+                nameof(request));
 
         var deviation = await repository.GetByIdAsync(id, ct).ConfigureAwait(false);
         if (deviation is null) return null;
 
+        // ── Decode & post-decode size guard ───────────────────────────────
         byte[] content;
         try
         {
@@ -263,6 +284,11 @@ public sealed class DeviationService(IDeviationRepository repository) : IDeviati
         {
             throw new ArgumentException("Base64Content is not valid base-64.", nameof(request));
         }
+
+        if (content.Length > MaxAttachmentSizeBytes)
+            throw new ArgumentException(
+                $"Attachment exceeds the maximum allowed size of {MaxAttachmentSizeBytes / (1024 * 1024)} MiB.",
+                nameof(request));
 
         var attachment = new DeviationAttachment
         {
@@ -329,16 +355,16 @@ public sealed class DeviationService(IDeviationRepository repository) : IDeviati
         {
             sb.AppendLine(string.Join(',',
                 d.Id,
-                EscapeCsv(d.Title),
+                SanitizeCsvField(d.Title),
                 d.Status,
                 d.Severity,
                 d.Category,
-                EscapeCsv(d.ReportedBy),
-                EscapeCsv(d.AssignedTo ?? string.Empty),
+                SanitizeCsvField(d.ReportedBy),
+                SanitizeCsvField(d.AssignedTo ?? string.Empty),
                 d.CreatedAt.ToString("O"),
                 d.UpdatedAt.ToString("O"),
                 d.DueDate?.ToString("O") ?? string.Empty,
-                EscapeCsv(string.Join(';', d.Tags))));
+                SanitizeCsvField(string.Join(';', d.Tags))));
         }
 
         return sb.ToString();
@@ -399,6 +425,34 @@ public sealed class DeviationService(IDeviationRepository repository) : IDeviati
         a.UploadedBy,
         a.UploadedAt);
 
+    // ── CSV helpers ───────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Sanitizes a user-controlled field for safe CSV export by:
+    /// <list type="number">
+    ///   <item>Neutralizing spreadsheet formula injection – values that begin
+    ///   with <c>=</c>, <c>+</c>, <c>-</c>, or <c>@</c> are prefixed with a
+    ///   single-quote so spreadsheet applications treat them as text.</item>
+    ///   <item>Applying standard RFC 4180 quoting/escaping.</item>
+    /// </list>
+    /// This is the single authoritative helper for all user-controlled CSV
+    /// fields; do not call <see cref="EscapeCsv"/> directly for such fields.
+    /// </summary>
+    private static string SanitizeCsvField(string value)
+    {
+        // Step 1 – neutralize formula injection
+        if (value.Length > 0 && value[0] is '=' or '+' or '-' or '@')
+            value = "'" + value;
+
+        // Step 2 – RFC 4180 escaping
+        return EscapeCsv(value);
+    }
+
+    /// <summary>
+    /// Applies RFC 4180 quoting: wraps the value in double-quotes and doubles
+    /// any embedded double-quotes when the value contains a comma, double-quote,
+    /// or newline.  Safe for use on values that have already been injection-neutralised.
+    /// </summary>
     private static string EscapeCsv(string value)
     {
         if (value.Contains(',') || value.Contains('"') || value.Contains('\n'))
