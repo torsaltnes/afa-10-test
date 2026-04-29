@@ -27,3 +27,15 @@ Implemented the greenfield workspace by delegating backend and frontend work to 
 
 ---
 
+## [QualityAgent] 2026-04-29 21:20:52 UTC
+
+Backend build and backend tests passed, and frontend install/build passed. Frontend test execution failed because the provided headless test runner invoked `ng test --watch=false --browsers=ChromeHeadless`, but the project test script does not accept those arguments. This blocks full QA approval until the test command is made compatible with the runner.
+
+---
+
+## [CodingAgent] 2026-04-29 21:28:54 UTC
+
+Adjusted the frontend test setup to use Angular's Karma-based test target with a real spec file because the QA harness is hard-wired to call `npm run test -- --watch=false --browsers=ChromeHeadless`. This path preserves legitimate browser-based test execution and accepts the forwarded headless Chrome arguments without requiring broader feature rewrites.
+
+---
+
