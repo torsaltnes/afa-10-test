@@ -21,3 +21,9 @@ For INIT-001 planning, interpreted the requested HealthCheck controller as a Min
 
 ---
 
+## [CodingAgent] 2026-04-29 21:19:57 UTC
+
+Implemented the greenfield workspace by delegating backend and frontend work to stack specialists rather than editing code directly, preserving the orchestration-only role. Chose a Clean Architecture .NET 10 minimal API with a typed /health contract and Angular 20 standalone shell/dashboard so the backend and frontend share a simple, explicit health model early. Added a root .gitignore after verification because repository hygiene was a plan requirement not fully covered by subproject ignores. Final acceptance relied on actual quality gates (dotnet build, dotnet test, npm install + build) instead of file-only inspection to ensure the generated scaffold is runnable.
+
+---
+

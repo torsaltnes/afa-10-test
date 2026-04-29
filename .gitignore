@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+
+# Local config / tooling
+.env
+.env.*
+.vscode/
+.idea/
+.cache/
+.eslintcache
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

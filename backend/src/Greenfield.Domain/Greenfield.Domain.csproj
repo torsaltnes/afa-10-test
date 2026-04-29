@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Greenfield.Domain</RootNamespace>
+    <AssemblyName>Greenfield.Domain</AssemblyName>
+  </PropertyGroup>
+</Project>
