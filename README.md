@@ -9,7 +9,7 @@ Greenfield er et fullstack-oppsett med en .NET 10 Web API-backend og en Angular 
 - Minimal APIs
 - Application/Domain/Infrastructure-arkitektur
 - In-memory lagring for deviation-flyten og dashboard-oppsummering
-- OpenAPI
+- OpenAPI/Scalar for API-dokumentasjon (`/openapi/v1.json` og `/api/docs`)
 - CORS
 
 ### Frontend
@@ -23,6 +23,7 @@ Greenfield er et fullstack-oppsett med en .NET 10 Web API-backend og en Angular 
 
 ### Testing
 - .NET-testprosjekter i `backend/tests`
+- Integrasjonstester for routing, OpenAPI og API-kontrakter
 - Karma/Jasmine for frontend-tester
 
 ## Installasjon
@@ -77,8 +78,13 @@ Frontend bruker `npm start`, som laster `proxy.conf.json` og bevarer `/api`-pref
 
 ## API-oversikt
 
+### API-dokumentasjon
+- `GET /api/docs` – browserbasert OpenAPI-dokumentasjon.
+- `GET /openapi/v1.json` – OpenAPI JSON-dokument.
+
 ### Backend
-- `GET /health` – returnerer helsestatus som JSON.
+- `GET /api/health` – returnerer helsestatus som JSON.
+- `GET /health` – bakoverkompatibel alias for helsesjekken.
 - `GET /api/dashboard/summary` – returnerer KPIer, statusfordeling, månedstrend og siste avvik.
 - `GET /api/deviations` – lister og søker avvik.
 - `GET /api/deviations/{id}` – henter ett avvik.

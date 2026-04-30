@@ -16,7 +16,13 @@ public static class DashboardEndpoints
             .WithTags("Dashboard");
 
         group.MapGet("/summary", GetSummary)
-             .WithName("GetDashboardSummary");
+             .WithName("GetDashboardSummary")
+             .WithSummary("Get dashboard summary")
+             .WithDescription(
+                 "Returns an aggregated summary of all deviations including total counts, " +
+                 "open and overdue counts, breakdowns by status/severity/category, " +
+                 "a six-month creation trend, and the five most-recently-updated deviations.")
+             .Produces<DashboardSummaryDto>(StatusCodes.Status200OK);
 
         return app;
     }

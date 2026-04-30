@@ -1,5 +1,6 @@
 using System.Text;
 using Greenfield.Application.Abstractions;
+using Greenfield.Application.Common;
 using Greenfield.Application.Deviations;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,12 @@ namespace Greenfield.Api.Endpoints;
 /// <summary>
 /// Registers all <c>/api/deviations</c> endpoints using Minimal API route groups.
 /// </summary>
+/// <remarks>
+/// Routing audit note: collection GET/POST were previously mapped to <c>"/"</c>
+/// which produced a trailing-slash canonical path (<c>/api/deviations/</c>).
+/// They are now mapped to <see cref="string.Empty"/> so the canonical path is
+/// <c>/api/deviations</c> with no trailing slash, matching all consumer expectations.
+/// </remarks>
 public static class DeviationEndpoints
 {
     public static IEndpointRouteBuilder MapDeviationEndpoints(this IEndpointRouteBuilder app)
@@ -18,53 +25,136 @@ public static class DeviationEndpoints
             .WithTags("Deviations");
 
         // ── List / search ─────────────────────────────────────────────────
-        group.MapGet("/", GetDeviations)
-             .WithName("GetDeviations");
+        // Mapped to string.Empty (not "/") so canonical path is /api/deviations.
+        group.MapGet(string.Empty, GetDeviations)
+             .WithName("GetDeviations")
+             .WithSummary("List deviations")
+             .WithDescription(
+                 "Returns a paginated, filtered list of deviation summaries. " +
+                 "Supports filtering by status, severity, category, assignee, and free-text search. " +
+                 "Results are sorted and paged according to the supplied query parameters.")
+             .Produces<PagedResult<DeviationSummaryDto>>(StatusCodes.Status200OK);
 
         // ── Export CSV (must be registered before /{id} to avoid capture) ─
         group.MapGet("/export", ExportCsv)
-             .WithName("ExportDeviationsCsv");
+             .WithName("ExportDeviationsCsv")
+             .WithSummary("Export deviations as CSV")
+             .WithDescription(
+                 "Exports the current filtered deviation list as a CSV file. " +
+                 "Applies the same filters as the list endpoint. " +
+                 "Formula-injection characters are neutralized for spreadsheet safety.")
+             .Produces(StatusCodes.Status200OK, contentType: "text/csv");
 
         // ── Single deviation ──────────────────────────────────────────────
         group.MapGet("/{id:guid}", GetDeviationById)
-             .WithName("GetDeviationById");
+             .WithName("GetDeviationById")
+             .WithSummary("Get a deviation by ID")
+             .WithDescription(
+                 "Returns the full deviation record including its timeline of activities " +
+                 "and list of attachments. Returns 404 if no deviation with the given ID exists.")
+             .Produces<DeviationDto>(StatusCodes.Status200OK)
+             .Produces(StatusCodes.Status404NotFound);
 
-        group.MapPost("/", CreateDeviation)
-             .WithName("CreateDeviation");
+        // ── Create (mapped to string.Empty so canonical path is /api/deviations) ─
+        group.MapPost(string.Empty, CreateDeviation)
+             .WithName("CreateDeviation")
+             .WithSummary("Create a new deviation")
+             .WithDescription(
+                 "Registers a new deviation in the system with status Registered. " +
+                 "Returns 201 Created with a Location header pointing at the new resource.")
+             .Accepts<CreateDeviationRequest>("application/json")
+             .Produces<DeviationDto>(StatusCodes.Status201Created)
+             .Produces<string>(StatusCodes.Status400BadRequest);
 
         group.MapPut("/{id:guid}", UpdateDeviation)
-             .WithName("UpdateDeviation");
+             .WithName("UpdateDeviation")
+             .WithSummary("Update a deviation")
+             .WithDescription(
+                 "Updates the mutable fields of an existing deviation. " +
+                 "Returns 404 if the deviation does not exist, 400 for validation failures.")
+             .Accepts<UpdateDeviationRequest>("application/json")
+             .Produces<DeviationDto>(StatusCodes.Status200OK)
+             .Produces(StatusCodes.Status404NotFound)
+             .Produces<string>(StatusCodes.Status400BadRequest);
 
         group.MapDelete("/{id:guid}", DeleteDeviation)
-             .WithName("DeleteDeviation");
+             .WithName("DeleteDeviation")
+             .WithSummary("Delete a deviation")
+             .WithDescription(
+                 "Permanently removes a deviation and all associated timeline entries " +
+                 "and attachments. Returns 204 on success, 404 if not found.")
+             .Produces(StatusCodes.Status204NoContent)
+             .Produces(StatusCodes.Status404NotFound);
 
         // ── Workflow transition ───────────────────────────────────────────
         group.MapPost("/{id:guid}/transition", TransitionDeviation)
-             .WithName("TransitionDeviation");
+             .WithName("TransitionDeviation")
+             .WithSummary("Transition deviation status")
+             .WithDescription(
+                 "Moves a deviation to a new workflow status following the permitted transition table. " +
+                 "Returns 400 if the requested transition is not allowed from the current status.")
+             .Accepts<TransitionDeviationRequest>("application/json")
+             .Produces<DeviationDto>(StatusCodes.Status200OK)
+             .Produces(StatusCodes.Status404NotFound)
+             .Produces<string>(StatusCodes.Status400BadRequest);
 
         // ── Timeline ─────────────────────────────────────────────────────
         group.MapGet("/{id:guid}/timeline", GetTimeline)
-             .WithName("GetDeviationTimeline");
+             .WithName("GetDeviationTimeline")
+             .WithSummary("Get deviation timeline")
+             .WithDescription(
+                 "Returns all activity entries for a deviation in chronological order, " +
+                 "including status changes, comments, and attachment events.")
+             .Produces<IReadOnlyList<ActivityDto>>(StatusCodes.Status200OK)
+             .Produces(StatusCodes.Status404NotFound);
 
         group.MapPost("/{id:guid}/comments", AddComment)
-             .WithName("AddDeviationComment");
+             .WithName("AddDeviationComment")
+             .WithSummary("Add a comment to a deviation")
+             .WithDescription(
+                 "Appends a free-text comment activity to the deviation's timeline. " +
+                 "Returns 201 Created with the new activity record.")
+             .Accepts<AddCommentRequest>("application/json")
+             .Produces<ActivityDto>(StatusCodes.Status201Created)
+             .Produces(StatusCodes.Status404NotFound)
+             .Produces<string>(StatusCodes.Status400BadRequest);
 
         // ── Attachments ───────────────────────────────────────────────────
         group.MapGet("/{id:guid}/attachments", GetAttachments)
-             .WithName("GetDeviationAttachments");
+             .WithName("GetDeviationAttachments")
+             .WithSummary("List deviation attachments")
+             .WithDescription(
+                 "Returns metadata for all attachments associated with the deviation. " +
+                 "Actual file content is not included in this response.")
+             .Produces<IReadOnlyList<AttachmentDto>>(StatusCodes.Status200OK)
+             .Produces(StatusCodes.Status404NotFound);
 
         group.MapPost("/{id:guid}/attachments", UploadAttachment)
-             .WithName("UploadDeviationAttachment");
+             .WithName("UploadDeviationAttachment")
+             .WithSummary("Upload an attachment to a deviation")
+             .WithDescription(
+                 "Uploads a base64-encoded file as an attachment to the deviation. " +
+                 "Maximum decoded size is 5 MiB. Returns 201 Created with attachment metadata.")
+             .Accepts<UploadAttachmentRequest>("application/json")
+             .Produces<AttachmentDto>(StatusCodes.Status201Created)
+             .Produces(StatusCodes.Status404NotFound)
+             .Produces<string>(StatusCodes.Status400BadRequest);
 
         group.MapDelete("/{id:guid}/attachments/{attachmentId:guid}", RemoveAttachment)
-             .WithName("RemoveDeviationAttachment");
+             .WithName("RemoveDeviationAttachment")
+             .WithSummary("Remove an attachment from a deviation")
+             .WithDescription(
+                 "Permanently removes an attachment from the deviation. " +
+                 "Returns 204 No Content on success, 404 if either the deviation or attachment is not found.")
+             .Produces(StatusCodes.Status204NoContent)
+             .Produces(StatusCodes.Status404NotFound);
 
         return app;
     }
 
     // ── Handlers ──────────────────────────────────────────────────────────
 
-    private static async Task<Ok<Greenfield.Application.Common.PagedResult<DeviationSummaryDto>>> GetDeviations(
+    private static async Task<Ok<PagedResult<DeviationSummaryDto>>> GetDeviations(
         [AsParameters] DeviationListQuery query,
         IDeviationService service,
         CancellationToken ct)

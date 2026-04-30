@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [TASK-20260430153157] – Vi sliter med at flere API endpoints returnerer 404 – 2026-04-30
+### Added
+- Nytt `OpenApiEndpoints`-oppsett som eksponerer OpenAPI JSON på `/openapi/v1.json` og browserdocs på `/api/docs`.
+- `backend/docs/api-routing-audit.md` for å dokumentere identifiserte 404-årsaker og remediation.
+- Integrasjonstester for OpenAPI-dokumentet, dokumentasjons-UI og dokumenterte endepunkter.
+- Bootstrap-utsrift som viser docs-URLer og anbefalt verifiseringskommando.
+### Changed
+- `Program.cs` bruker nå navngitt OpenAPI-dokument (`v1`) og eksponerer docs-ruter i alle miljøer.
+- `HealthEndpoints`, `DashboardEndpoints` og `DeviationEndpoints` fikk normaliserte ruter og utvidet OpenAPI-metadata.
+- `bootstrap.sh` og `bootstrap.ps1` skriver nå ut dokumentasjonslenker og testkommando etter oppsett.
+### Fixed
+- `GET /api/health` er nå tilgjengelig som kanonisk helserute, samtidig som `/health` beholdes som alias.
+- `GET /api/deviations` bruker nå kanonisk uten-trailing-slash-rute.
+- API-dokumentasjon returnerer ikke lenger 404 i standard integrasjonstestmiljø.
+
 ## [TASK-20260430101426] – Bug in the application. Getting 404 on requests to this url: http://localhost:4200/api/deviations – 2026-04-30
 ### Added
 - Integrasjonstester for `GET /api/deviations` som verifiserer suksessstatus, `application/json` og array-payload.
