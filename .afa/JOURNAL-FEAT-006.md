@@ -30,3 +30,15 @@ Verified the FEAT-006 dashboard stack end-to-end with successful backend build/t
 
 ---
 
+## [ReviewAgent] 2026-04-30 09:25:03 UTC
+
+Approved after focused review of the dashboard path: no OWASP-relevant injection, IDOR, path traversal, or unsafe HTML sinks were found. The API endpoint is read-only and only returns in-memory summary data; the Angular UI uses interpolation/routerLink rather than innerHTML or direct DOM writes, so user-controlled deviation fields remain escaped. Dependency audit was low risk with no critical vulnerabilities; only a minor note that the frontend package pins should avoid `latest` in release workflows. Performance-wise, the dashboard summary does have small extra allocations and repeated counting across a bounded recent-month window, but nothing security-significant.
+
+---
+
+## [DocAgent] 2026-04-30 09:26:08 UTC
+
+Oppdaterte README og CHANGELOG med faktiske FEAT-006-endringer fra journalen: la inn nytt /api/dashboard/summary-endepunkt, beskrev dashboardets live dataflyt og root-ruten som erstatter gammel dashboard-visning. Valgte å beholde eksisterende seksjoner og språkstil, og begrenset changelog-oppføringen til endringer som faktisk er implementert for å unngå spekulasjon.
+
+---
+

@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [FEAT-006] – Deviation Management Dashboard – 2026-04-30
+### Added
+- Nytt `GET /api/dashboard/summary`-endepunkt for KPIer, statusfordeling, månedstrend og siste avvik.
+- API-basert dashboard i Angular med KPI-kort, diagramområde, navigasjonssidepanel og state-håndtering for lasting, feil og tomt resultat.
+- Egen dashboard-kontrakt og komponenter for å vise sanntidsdata fra avviks-APIet.
+### Changed
+- Erstattet det seeded/mock-baserte dashboardet med en live visning som henter data fra backend.
+- Synkroniserte frontend-modeller for dashboard og avvik med backend-kontrakten.
+### Fixed
+- Rettet statusverdier i frontend slik at `UnderAssessment` og `UnderInvestigation` matcher backend.
+- Rettet typing av nylige avviksrader mot backendens summary-shape.
+
 ## [FEAT-002] – Deviation / Non-conformity management feature – 2026-04-29
 ### Added
 - Deviation-funksjon med liste, registrering og behandlingsside under `frontend/src/app/features/deviations`.

@@ -7,10 +7,10 @@ Greenfield er et fullstack-oppsett med en .NET 10 Web API-backend og en Angular 
 ### Backend
 - .NET 10 / ASP.NET Core
 - Minimal APIs
+- Application/Domain/Infrastructure-arkitektur
+- In-memory lagring for deviation-flyten og dashboard-oppsummering
 - OpenAPI
 - CORS
-- In-memory lagring for deviation-flyten
-- Clean Architecture-prosjekter: `Api`, `Application`, `Domain`, `Infrastructure`
 
 ### Frontend
 - Angular 20+
@@ -18,7 +18,7 @@ Greenfield er et fullstack-oppsett med en .NET 10 Web API-backend og en Angular 
 - Signals
 - Reactive Forms
 - RxJS
-- Tailwind CSS v4
+- Tailwind CSS v4 med oklch-baserte design tokens
 - Chart.js / ng2-charts
 
 ### Testing
@@ -64,6 +64,7 @@ Frontend bruker en dev-proxy fra `/api` til backend på `http://localhost:5000`.
 
 ### Backend
 - `GET /health` – returnerer helsestatus som JSON.
+- `GET /api/dashboard/summary` – returnerer KPIer, statusfordeling, månedstrend og siste avvik.
 - `GET /api/deviations` – lister og søker avvik.
 - `GET /api/deviations/{id}` – henter ett avvik.
 - `POST /api/deviations` – registrerer et nytt avvik.
@@ -78,6 +79,7 @@ Frontend bruker en dev-proxy fra `/api` til backend på `http://localhost:5000`.
 - `DELETE /api/deviations/{id}/attachments/{attachmentId}` – fjerner vedlegg.
 
 ### Frontend
+- `/` – dashboard for avviksstyring.
 - `/deviations` – avvikslisten.
 - `/deviations/new` – registreringsskjema for nytt avvik.
 - `/deviations/:id` – behandlings-/detaljside for et avvik.
