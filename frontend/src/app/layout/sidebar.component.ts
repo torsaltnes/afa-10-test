@@ -27,46 +27,53 @@ const NAV_ITEMS: NavItem[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <div class="flex h-full flex-col">
+    <div class="flex h-full flex-col bg-sidebar-bg">
 
-      <!-- ── Brand ─────────────────────────────────────────────── -->
-      <div class="flex h-16 items-center gap-3 border-b border-border px-5">
+      <!-- ── Brand ──────────────────────────────────────────────── -->
+      <div class="flex h-16 shrink-0 items-center gap-3 border-b border-border px-4">
         <div
-          class="flex size-8 items-center justify-center rounded-lg bg-primary text-white"
+          class="flex size-8 shrink-0 items-center justify-center rounded-lg
+                 bg-primary text-button-primary-text shadow-sm"
           aria-hidden="true"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
             <path d="M8 1L15 5v6l-7 4L1 11V5z"/>
           </svg>
         </div>
-        <span class="text-sm font-semibold text-text-primary">Greenfield</span>
+        <span class="text-sm font-semibold tracking-tight text-text-primary">Greenfield</span>
 
         <!-- Mobile close button -->
         <button
-          class="ml-auto rounded-md p-1 text-text-secondary transition-colors duration-150
+          type="button"
+          class="ml-auto rounded-md p-1.5 text-text-secondary transition-colors duration-150
                  hover:bg-surface-raised hover:text-text-primary
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
+                 active:bg-surface-muted
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40
                  lg:hidden"
           (click)="closeRequest.emit()"
           aria-label="Close menu"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
             <path d="M12.78 4.28L11.72 3.22 8 6.94 4.28 3.22 3.22 4.28 6.94 8l-3.72 3.72 1.06 1.06L8 9.06l3.72 3.72 1.06-1.06L9.06 8z"/>
           </svg>
         </button>
       </div>
 
       <!-- ── Navigation ─────────────────────────────────────────── -->
-      <nav class="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label="Main navigation">
+      <nav
+        class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-2.5 py-3 scrollbar-thin"
+        aria-label="Main navigation"
+      >
         @for (item of navItems; track item.route) {
           <a
+            #rla="routerLinkActive"
             [routerLink]="item.route"
-            routerLinkActive="bg-surface-raised text-text-primary"
+            [routerLinkActive]="['bg-primary', 'text-button-primary-text', 'shadow-sm']"
             [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-            class="flex items-center gap-3 rounded-lg px-3 py-2 text-body
-                   text-text-secondary transition-colors duration-150
-                   hover:bg-surface-raised hover:text-text-primary
-                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            [class]="rla.isActive
+              ? 'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium bg-primary text-button-primary-text shadow-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-sidebar-bg'
+              : 'flex items-center gap-3 rounded-md px-3 py-2 text-sm text-text-secondary transition-colors duration-150 hover:bg-surface hover:text-text-primary active:bg-primary-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 focus-visible:ring-offset-sidebar-bg'"
+            [attr.aria-current]="rla.isActive ? 'page' : null"
           >
             <span aria-hidden="true" class="size-4 shrink-0">
               @switch (item.icon) {
@@ -120,25 +127,40 @@ const NAV_ITEMS: NavItem[] = [
         }
       </nav>
 
-      <!-- ── User profile ───────────────────────────────────────── -->
-      <div class="border-t border-border p-3">
-        <div
-          class="flex items-center gap-3 rounded-lg px-3 py-2
-                 transition-colors duration-150 hover:bg-surface-raised
-                 cursor-default"
+      <!-- ── User profile ─────────────────────────────────────────── -->
+      <div class="shrink-0 border-t border-border p-2.5">
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 rounded-md px-3 py-2
+                 transition-colors duration-150
+                 hover:bg-primary-surface
+                 active:bg-primary-surface-hover
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          aria-label="User account settings"
         >
           <div
-            class="flex size-8 shrink-0 items-center justify-center rounded-full
-                   bg-primary text-xs font-semibold text-white"
+            class="flex size-7 shrink-0 items-center justify-center rounded-full
+                   bg-primary text-xs font-semibold text-button-primary-text"
             aria-hidden="true"
           >
             JD
           </div>
-          <div class="min-w-0">
-            <p class="truncate text-caption font-medium text-text-primary">Jane Doe</p>
-            <p class="truncate text-caption text-text-secondary">jane@example.com</p>
+          <div class="min-w-0 text-left">
+            <p class="truncate text-xs font-medium leading-snug text-text-primary">Jane Doe</p>
+            <p class="truncate text-xs leading-snug text-text-muted">jane@example.com</p>
           </div>
-        </div>
+          <!-- Chevron indicator -->
+          <svg
+            class="ml-auto size-3 shrink-0 text-text-muted"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            aria-hidden="true"
+          >
+            <path d="M3 5l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
 
     </div>

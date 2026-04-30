@@ -68,5 +68,9 @@ Write-Host "    OpenAPI JSON: http://localhost:5000/openapi/v1.json"
 Write-Host ""
 Write-Host "  Verification (integration tests):" -ForegroundColor Yellow
 Write-Host "    dotnet test backend/tests/Greenfield.Api.IntegrationTests/Greenfield.Api.IntegrationTests.csproj"
+Write-Host ""
+Write-Host "  Verification (frontend build + unit tests):" -ForegroundColor Yellow
+Write-Host "    cd frontend ; npm run build"
+Write-Host "    cd frontend ; npm test -- --watch=false --browsers=ChromeHeadless"
 Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
