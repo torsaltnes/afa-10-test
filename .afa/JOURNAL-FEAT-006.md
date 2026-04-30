@@ -42,3 +42,9 @@ Oppdaterte README og CHANGELOG med faktiske FEAT-006-endringer fra journalen: la
 
 ---
 
+## [WriterAgent] 2026-04-30 09:26:22 UTC
+
+Chose PR title '[FEAT-006] Deviation Management Dashboard' to preserve the original task title and keep the release note focused on the dashboard replacement. Framed the summary around the API-backed Angular dashboard and the new /api/dashboard/summary contract so the PR highlights the end-to-end delivery and verification.
+
+---
+
