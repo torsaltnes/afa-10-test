@@ -1,237 +1,192 @@
 # IMPLEMENTATION_PLAN
 
 ## 1. Overview
-Implement standards-based OpenAPI generation for the ASP.NET Core minimal API, expose a stable JSON document plus browser documentation endpoint, and eliminate routing mismatches that currently surface as 404s. The work should keep the existing backend contract intact while adding route aliases only where needed for compatibility. The implementation must also add automated route/documentation regression tests and a written audit of every 404 root cause discovered during remediation.
+Replace the current dark Tailwind/Angular theme tokens with the light OKLCH palette defined in `.afa/VISUAL_MANIFEST.json`.
+Keep the existing Angular shell/navigation structure, but rebind all shell-level colors to semantic CSS custom properties so the new palette is applied consistently across the app.
+The implementation is frontend-only and must not change API contracts or backend behavior.
 
 ## 2. Folder structure and files to create
-
-### Create
-- `backend/src/Greenfield.Api/Endpoints/OpenApiEndpoints.cs` (create)
-- `backend/docs/api-routing-audit.md` (create)
-- `backend/tests/Greenfield.Api.IntegrationTests/OpenApi/OpenApiDocumentTests.cs` (create)
-- `backend/tests/Greenfield.Api.IntegrationTests/OpenApi/ApiDocumentationUiTests.cs` (create)
-- `backend/tests/Greenfield.Api.IntegrationTests/Routing/DocumentedEndpointStatusTests.cs` (create)
-
-### Modify
-- `backend/src/Greenfield.Api/Program.cs` (modify)
-- `backend/src/Greenfield.Api/Endpoints/HealthEndpoints.cs` (modify)
-- `backend/src/Greenfield.Api/Endpoints/DashboardEndpoints.cs` (modify)
-- `backend/src/Greenfield.Api/Endpoints/DeviationEndpoints.cs` (modify)
-- `backend/src/Greenfield.Api/appsettings.json` (modify)
-- `backend/tests/Greenfield.Api.IntegrationTests/Health/HealthEndpointsTests.cs` (modify)
-- `backend/tests/Greenfield.Api.IntegrationTests/Deviations/DeviationEndpointRouteTests.cs` (modify)
-- `backend/tests/Greenfield.Api.IntegrationTests/Deviations/DeviationEndpointsTests.cs` (modify)
+- `frontend/src/styles.css` (modify)
+- `frontend/src/app/layout/shell.component.ts` (modify)
+- `frontend/src/app/layout/sidebar.component.ts` (modify)
+- `frontend/src/app/layout/topbar.component.ts` (modify)
+- `frontend/src/app/layout/shell.component.spec.ts` (create)
+- `frontend/src/app/layout/sidebar.component.spec.ts` (create)
+- `frontend/src/app/layout/topbar.component.spec.ts` (create)
+- `frontend/src/app/theme/theme-tokens.spec.ts` (create)
 - `bootstrap.sh` (modify)
 - `bootstrap.ps1` (modify)
 
-## 2a. Application Shell & Navigation
-Not applicable for this backend-only feature. No Angular routed pages, shell navigation, or app-shell links are required for acceptance.
-
 ## 2b. Visual Requirements
-A visual manifest exists, but this feature does not add frontend UI. Preserve these project-wide UI decisions if any incidental frontend/API-link work is later required:
-- CSS custom properties already implied by the manifest should remain the source of truth for app theming:
-  - `--color-primary`, `--color-primary-hover`
-  - `--color-surface`, `--color-surface-raised`, `--color-surface-subtle`
-  - `--color-border`
-  - `--color-text-primary`, `--color-text-secondary`, `--color-text-placeholder`
-  - `--color-danger`, `--color-warning`, `--color-success`
-  - `--color-sidebar-bg`, `--color-topbar-bg`, `--color-button-primary-text`, `--color-button-secondary-bg`, `--color-button-ghost-bg`, `--color-button-ghost-text`
-- Component-library direction remains: Angular 20 primitives + Tailwind CSS 4 for layout/styling, `chart.js` + `ng2-charts` for charting, native table/form components unless a later feature proves otherwise.
-- Layout strategy remains manifest-aligned: flex-based shell (topbar + sidebar + content), grid for dense forms/tables, mobile collapse at `<768px`, tablet at `768-1024px`, desktop at `>1024px`.
-- Visual tokens to preserve project-wide: `Inter, system-ui, -apple-system, sans-serif`, medium border radius, normal spacing scale, light theme as default.
-- Do **not** invest effort styling the generated API docs UI to match the app shell; keep it isolated as infrastructure tooling.
+### Canonical color palette
+Use the visual manifest as the source of truth and normalize the shared light palette into the existing semantic token set.
+
+| Semantic token | Value / mapping |
+|---|---|
+| `--color-primary` | `oklch(0.52 0.19 250)` |
+| `--color-primary-hover` | `oklch(0.44 0.19 250)` |
+| `--color-background` | map to `--color-surface-subtle` |
+| `--color-surface` | `oklch(0.98 0.00 0)` |
+| `--color-surface-raised` | `oklch(1.00 0.00 0)` |
+| `--color-surface-subtle` | `oklch(0.95 0.00 0)` |
+| `--color-surface-overlay` | light overlay alias derived from raised/subtle surface; keep token for compatibility |
+| `--color-border` | `oklch(0.88 0.00 0)` |
+| `--color-text-primary` | `oklch(0.20 0.00 0)` |
+| `--color-text-secondary` | `oklch(0.45 0.00 0)` |
+| `--color-text-placeholder` | `oklch(0.65 0.00 0)` |
+| `--color-danger` | `oklch(0.56 0.22 27)` |
+| `--color-warning` | `oklch(0.75 0.17 75)` |
+| `--color-success` | `oklch(0.60 0.17 150)` |
+| `--color-sidebar-bg` | `oklch(0.96 0.00 0)` |
+| `--color-topbar-bg` | `oklch(1.00 0.00 0)` |
+| `--color-button-primary-text` | `oklch(1.00 0.00 0)` |
+| `--color-button-secondary-bg` | `oklch(0.93 0.00 0)` |
+| `--color-button-ghost-bg` | `oklch(0.95 0.005 240)` |
+| `--color-button-ghost-text` | `oklch(0.30 0.02 250)` |
+
+### Component-library / styling decisions
+- Keep the existing Angular standalone + Tailwind CSS v4 stack.
+- Do not introduce Angular Material or another UI kit; the manifest only requires shell, navigation, table, form, and button primitives already supported by Tailwind utilities and semantic tokens.
+- Preserve `chart.js` / `ng2-charts` compatibility by keeping semantic chart tokens in `styles.css` and remapping them to the new palette.
+
+### Layout strategy
+- Preserve the manifest shell pattern: top-level column layout, horizontal body split, sidebar on desktop, collapsible navigation on mobile.
+- Continue using Flex for shell/topbar/sidebar composition.
+- Use Grid for content forms/tables where the manifest specifies multi-column layouts.
+- Responsive breakpoints: mobile `<768px`, tablet `768px–1024px`, desktop `>1024px`.
+- On mobile, keep the existing collapsible sidebar behavior and ensure full-width action buttons and single-column content sections.
+
+### Visual tokens to enforce project-wide
+- Font family: `Inter, system-ui, -apple-system, sans-serif`.
+- Border radius: standardize interactive controls and cards on Tailwind `rounded-md`.
+- Spacing scale: keep Tailwind defaults, but use a consistent semantic rhythm (`gap-2/4/6`, `p-4/6`, `px-4/6`).
+- Do not use raw hard-coded OKLCH/hex values inside component templates once the global tokens exist.
 
 ## 3. Detailed implementation instructions per file
+### `frontend/src/styles.css`
+- Keep Tailwind v4 `@import "tailwindcss";` and the top-level `@theme` block.
+- Replace the current dark palette tokens with the manifest light palette above.
+- Keep existing semantic token names to avoid a broad refactor; add any missing manifest tokens needed by shell and form components (`--color-sidebar-bg`, `--color-topbar-bg`, `--color-text-placeholder`, button tokens).
+- Preserve compatibility tokens already used elsewhere (`--color-background`, `--color-surface-overlay`, `--color-chart-1/2/3`) by remapping them to the new light palette instead of removing them.
+- Remove the extra `Geist` fallback from `--font-sans`; align the font stack with the manifest.
+- Update `html, body` defaults to use the light background/text tokens.
+- Enforce the pattern: all global raw color values live only in `@theme`; component-level styles/templates must consume semantic tokens.
 
-### `backend/src/Greenfield.Api/Program.cs`
-- Keep the current minimal-hosting structure and existing service registrations.
-- Replace the anonymous OpenAPI registration with a named document, e.g. `v1`, so the JSON route is deterministic.
-- Read title/version defaults from existing `AppSettings` values and apply them to the generated OpenAPI document.
-- Stop limiting OpenAPI mapping to `Development` only; the current environment guard is one confirmed cause of documentation 404s.
-- Call a new endpoint-mapping extension (`MapOpenApiEndpoints`) before the functional endpoint groups.
-- Preserve existing endpoint registration order for business APIs.
-- Architectural pattern: composition root only; no handler logic in `Program`.
+### `frontend/src/app/layout/shell.component.ts`
+- Keep `ShellComponent` as the routing shell/container only; do not move business logic into it.
+- Audit the inline template and any class bindings for dark-theme utilities (`bg-*`, `text-*`, `border-*`, opacity overlays) and replace them with semantic Tailwind classes backed by the updated theme tokens.
+- Root wrapper should render with semantic background/text classes so routed pages inherit the new palette automatically.
+- Preserve existing responsive behavior and interactions with `AppShellStore`; this file is a visual restyling pass, not a logic rewrite.
 
-### `backend/src/Greenfield.Api/Endpoints/OpenApiEndpoints.cs`
-- Create a static `OpenApiEndpoints` class following the same endpoint-extension style as the existing API.
-- Required public method: `MapOpenApiEndpoints(this IEndpointRouteBuilder app)`.
-- Responsibilities:
-  - Map the OpenAPI JSON document to a stable path such as `/openapi/{documentName}.json`.
-  - Expose a browser-based docs UI at `/api/docs`.
-  - If the chosen UI helper only supports its own default route, add a lightweight redirect endpoint from `/api/docs` to that route.
-  - Exclude redirect/helper routes from the generated schema.
-- Keep docs routes infrastructure-only; no business models should live in this file.
+### `frontend/src/app/layout/sidebar.component.ts`
+- Keep `NavItem` and `SidebarComponent` structure unchanged.
+- Replace any hard-coded dark sidebar/background/hover/active classes with semantic equivalents based on `--color-sidebar-bg`, `--color-border`, `--color-primary`, `--color-primary-hover`, `--color-text-primary`, and `--color-text-secondary`.
+- Active navigation state should use the primary brand color with accessible foreground text (`--color-button-primary-text`).
+- Inactive, hover, and focus states must remain visually distinct in the light palette.
+- Preserve mobile collapse/open behavior and existing navigation links.
 
-### `backend/src/Greenfield.Api/Endpoints/HealthEndpoints.cs`
-- Preserve the existing health payload behavior and 200/503 branching.
-- Introduce a canonical `/api/health` route so health follows the same `/api/*` namespace as the rest of the backend.
-- Keep `/health` as a backward-compatible alias unless implementation testing proves no caller depends on it.
-- Add explicit metadata:
-  - `WithName("GetHealth")`
-  - `WithSummary(...)`
-  - `WithDescription(...)`
-  - `Produces(...200...)` and `Produces(...503...)`
-  - `WithOpenApi()`
-- Root cause to document in the audit: route prefix inconsistency (`/health` vs `/api/*`) caused proxy/client confusion and 404s for `/api/health` callers.
+### `frontend/src/app/layout/topbar.component.ts`
+- Keep `TopbarComponent` responsibilities limited to shell header/navigation controls.
+- Replace any dark topbar, divider, avatar, breadcrumb, button, and text classes with semantic token-based classes.
+- Topbar surface must use `--color-topbar-bg` with `--color-border` dividers.
+- Breadcrumbs/secondary text should use `--color-text-secondary`; primary controls/CTA states should use `--color-primary` and `--color-primary-hover`.
+- Preserve existing actions, menus, and responsive behavior.
 
-### `backend/src/Greenfield.Api/Endpoints/DashboardEndpoints.cs`
-- Keep `/api/dashboard/summary` as the canonical route.
-- Enrich the endpoint with complete OpenAPI metadata: summary, description, operation name, tags, and `Produces<DashboardSummaryDto>(200)`.
-- Ensure the response contract in the schema matches the DTO returned by `TypedResults.Ok`.
-- No new dashboard routes should be introduced unless testing finds a genuine missing contract route.
+### `frontend/src/app/layout/shell.component.spec.ts`
+- Create a focused shell smoke test using Angular TestBed.
+- Verify the shell renders successfully with the routed layout container.
+- Assert that the outer shell uses semantic theme classes rather than obsolete dark-specific classes.
+- Verify no component initialization errors occur when the shell is created.
 
-### `backend/src/Greenfield.Api/Endpoints/DeviationEndpoints.cs`
-- Keep `/api/deviations` as the canonical group prefix.
-- Normalize group-root mappings to `string.Empty` instead of `"/"` for collection GET/POST so the documented canonical path is `/api/deviations` rather than a trailing-slash variant.
-- Add endpoint metadata to **every** mapped operation:
-  - stable `WithName(...)`
-  - `WithSummary(...)`
-  - `WithDescription(...)`
-  - `Produces<T>(...)` / `Produces(...)`
-  - `Accepts<T>(...)` for body-based endpoints where helpful
-  - `WithOpenApi()`
-- Verify that route ordering still keeps `/export` above `/{id:guid}`.
-- During remediation, explicitly test all documented deviation routes with valid inputs; if any currently expected consumer path is missing, add a backward-compatible alias rather than silently changing the contract.
-- Root causes to watch for in the audit:
-  - missing OpenAPI metadata causing inaccurate docs,
-  - possible canonical-path ambiguity for group-root routes,
-  - any verb/path mismatch discovered during integration testing.
+### `frontend/src/app/layout/sidebar.component.spec.ts`
+- Create tests for default rendering, active navigation state, and mobile/sidebar toggle rendering.
+- Assert navigation items render semantic theme classes for active/inactive states.
+- Confirm no dark-theme-only utility classes remain in the rendered output.
 
-### `backend/src/Greenfield.Api/appsettings.json`
-- Add an `OpenApi` section for stable document configuration, e.g. document name, JSON route, and UI route.
-- Keep defaults environment-agnostic so local/test environments do not hide docs.
-- Do not add auth/security settings here; that is outside scope.
+### `frontend/src/app/layout/topbar.component.spec.ts`
+- Create tests for topbar rendering, navigation/action controls, and secondary text presentation.
+- Assert semantic classes are applied to the header container and primary controls.
+- Include a no-console-error smoke assertion for component creation if the current test setup supports console spying.
 
-### `backend/docs/api-routing-audit.md`
-- Create a plain markdown audit artifact with a table containing:
-  - endpoint/path,
-  - HTTP verb,
-  - before-fix observed result,
-  - root cause,
-  - remediation,
-  - after-fix expected status,
-  - automated test that covers it.
-- Seed the document with the confirmed baseline issues:
-  - docs JSON unavailable outside Development,
-  - no browser docs UI route,
-  - `/api/health` missing while `/health` exists.
-- Extend the document with any additional 404 findings discovered while implementing deviation/dashboard route verification.
-
-### `backend/tests/Greenfield.Api.IntegrationTests/OpenApi/OpenApiDocumentTests.cs`
-- Create `OpenApiDocumentTests` using `WebApplicationFactory<Program>`.
-- Required assertions:
-  - `GET /openapi/v1.json` returns 200 and JSON.
-  - document contains the expected OpenAPI version and `info` fields.
-  - document includes `/api/health`, `/api/dashboard/summary`, and the full deviation route set.
-  - each operation exposes the expected HTTP verb, operationId/name, tags, and response codes.
-- Add schema assertions only for contracts already surfaced by the API; do not snapshot the entire document blindly.
-
-### `backend/tests/Greenfield.Api.IntegrationTests/OpenApi/ApiDocumentationUiTests.cs`
-- Create `ApiDocumentationUiTests`.
-- Required assertions:
-  - `/api/docs` returns a successful HTML response or an expected redirect to the actual UI endpoint.
-  - the UI references the generated OpenAPI JSON route.
-  - the docs endpoint no longer returns 404 in the default integration-test environment.
-
-### `backend/tests/Greenfield.Api.IntegrationTests/Routing/DocumentedEndpointStatusTests.cs`
-- Create a route-smoke test suite that verifies every documented endpoint can be called with valid parameters and does **not** return 404.
-- Use seeded data where possible; when no seeded ID is available, create a deviation first and reuse its identifier through the test flow.
-- Cover at minimum:
-  - `GET /api/health`
-  - `GET /api/dashboard/summary`
-  - `GET /api/deviations`
-  - `GET /api/deviations/export`
-  - `GET /api/deviations/{id}`
-  - `PUT /api/deviations/{id}`
-  - `POST /api/deviations/{id}/transition`
-  - `GET /api/deviations/{id}/timeline`
-  - `POST /api/deviations/{id}/comments`
-  - attachment endpoints with a valid seeded or created deviation
-- Assert intended status codes for valid inputs, not just non-404.
-
-### `backend/tests/Greenfield.Api.IntegrationTests/Health/HealthEndpointsTests.cs`
-- Extend the existing suite to verify the canonical `/api/health` route.
-- If `/health` is retained as an alias, add an alias-regression assertion so future cleanup does not accidentally break legacy callers.
-- Keep payload-shape and enum-string assertions.
-
-### `backend/tests/Greenfield.Api.IntegrationTests/Deviations/DeviationEndpointRouteTests.cs`
-- Keep the current list-route regression purpose, but update it to reflect the canonical non-trailing-slash route.
-- Add route assertions for `/api/deviations/export` and any alias path introduced during remediation.
-- Ensure the tests fail clearly on routing regressions rather than on business validation failures.
-
-### `backend/tests/Greenfield.Api.IntegrationTests/Deviations/DeviationEndpointsTests.cs`
-- Add or adjust happy-path integration tests for deviation operations that previously masked routing problems.
-- Ensure tests create/use valid IDs and payloads so failures identify routing issues, not invalid request bodies.
-- Prefer scenario-based coverage over duplicating all assertions from the new route-smoke suite.
+### `frontend/src/app/theme/theme-tokens.spec.ts`
+- Create a global-style verification spec.
+- Read computed styles from `document.documentElement` and assert that the critical tokens are defined: primary, primary-hover, surface, surface-raised, surface-subtle, border, text-primary, text-secondary, danger, warning, success, sidebar-bg, topbar-bg.
+- Add a regression assertion that the app no longer exposes the previous dark background token value.
+- If chart tokens are still used in the app, also assert `--color-chart-1/2/3` remain defined.
 
 ### `bootstrap.sh`
-- Keep the script focused on local environment setup.
-- Ensure it restores `backend/Greenfield.sln` and installs frontend dependencies exactly as today.
-- Update the post-setup output so it prints the documentation URLs (`/api/docs`, `/openapi/v1.json`) and the recommended verification test command for the integration suite.
-- Preserve the note about using the Angular proxy so `/api/*` routes remain unchanged end-to-end.
+- Keep the existing restore/install flow.
+- Add frontend verification commands to the printed instructions: `cd frontend && npm run build` and `cd frontend && npm test -- --watch=false --browsers=ChromeHeadless`.
+- Keep backend restore instructions unchanged.
+- Do not add feature-specific runtime dependencies or environment variables.
 
 ### `bootstrap.ps1`
-- Mirror the shell-script behavior and output.
-- Print the same docs URLs and verification commands as the POSIX script.
-- Keep command checks for `dotnet` and `npm`.
+- Mirror the shell script updates in PowerShell form.
+- Keep restore/install logic unchanged.
+- Add the same frontend verification commands to the final output block.
 
 ## 4. Dependencies
-- **NuGet (existing, keep pinned):**
-  - `Microsoft.AspNetCore.OpenApi` `10.0.7` in `backend/src/Greenfield.Api/Greenfield.Api.csproj`
-  - `Microsoft.AspNetCore.Mvc.Testing` `10.0.7` in `backend/tests/Greenfield.Api.IntegrationTests/Greenfield.Api.IntegrationTests.csproj`
-  - `xunit` `2.9.3` in `backend/tests/Greenfield.Api.IntegrationTests/Greenfield.Api.IntegrationTests.csproj`
-  - `FluentAssertions` `7.2.0` in `backend/tests/Greenfield.Api.IntegrationTests/Greenfield.Api.IntegrationTests.csproj`
-- **NuGet additions:** none required if the .NET 10 built-in OpenAPI JSON + UI mapping APIs compile successfully.
-- **npm:** no package changes required for this feature.
+No new dependencies are required for this feature.
+
+Relevant existing frontend packages that must remain compatible:
+- `@angular/animations` `^20.0.0`
+- `@angular/common` `^20.0.0`
+- `@angular/compiler` `^20.0.0`
+- `@angular/core` `^20.0.0`
+- `@angular/forms` `^20.0.0`
+- `@angular/platform-browser` `^20.0.0`
+- `@angular/router` `^20.0.0`
+- `tailwindcss` `^4.0.0`
+- `@tailwindcss/postcss` `latest` (leave unchanged unless already pinned by lockfile)
+- `chart.js` `^4.4.0`
+- `ng2-charts` `^7.0.0`
+- `jasmine-core` `~5.1.0`
+- `karma` `~6.4.0`
+- `karma-chrome-launcher` `~3.2.0`
+- `karma-coverage` `~2.2.0`
+- `karma-jasmine` `~5.1.0`
+- `karma-jasmine-html-reporter` `~2.1.0`
 
 ## 5. Automated tests
-Create or modify the following test files:
-- `backend/tests/Greenfield.Api.IntegrationTests/OpenApi/OpenApiDocumentTests.cs` (create)
-- `backend/tests/Greenfield.Api.IntegrationTests/OpenApi/ApiDocumentationUiTests.cs` (create)
-- `backend/tests/Greenfield.Api.IntegrationTests/Routing/DocumentedEndpointStatusTests.cs` (create)
-- `backend/tests/Greenfield.Api.IntegrationTests/Health/HealthEndpointsTests.cs` (modify)
-- `backend/tests/Greenfield.Api.IntegrationTests/Deviations/DeviationEndpointRouteTests.cs` (modify)
-- `backend/tests/Greenfield.Api.IntegrationTests/Deviations/DeviationEndpointsTests.cs` (modify)
+Test files to create:
+- `frontend/src/app/layout/shell.component.spec.ts`
+- `frontend/src/app/layout/sidebar.component.spec.ts`
+- `frontend/src/app/layout/topbar.component.spec.ts`
+- `frontend/src/app/theme/theme-tokens.spec.ts`
 
-Coverage goals:
-- OpenAPI JSON endpoint availability and schema validity.
-- Browser documentation endpoint availability.
-- Route metadata parity: documented paths/verbs/operationIds must match mapped endpoints.
-- Non-404 verification for every documented endpoint when called with valid parameters.
-- Backward-compatibility verification for any alias retained to avoid breaking callers.
+Test coverage requirements:
+- Global theme-token presence and regression coverage against the old dark palette.
+- Shell, topbar, and sidebar rendering with semantic theme classes.
+- Active/hover-ready navigation states remain visually differentiated after the palette swap.
+- No console errors during component creation.
+- Frontend verification command set: `npm run build` and `npm test -- --watch=false --browsers=ChromeHeadless`.
 
 ## 6. Acceptance criteria
-- **AC1 — OpenAPI/Swagger Documentation Generated**  
-  Fulfilled by named OpenAPI generation in `Program.cs`, endpoint-level metadata in the minimal API mappings, and `OpenApiDocumentTests` validating the produced schema.
-- **AC2 — Documentation Endpoint Available**  
-  Fulfilled by `OpenApiEndpoints.cs` exposing the JSON document and browser UI at stable routes, plus integration tests proving `/api/docs` is reachable.
-- **AC3 — 404 Errors Resolved**  
-  Fulfilled by normalizing misconfigured routes (confirmed `/api/health`, docs-only-in-development issue, and any additional mismatches found during implementation) and by the `DocumentedEndpointStatusTests` suite asserting expected non-404 behavior for valid requests.
-- **AC4 — Documentation Reflects Reality**  
-  Fulfilled by attaching summaries, tags, operation names, request/response metadata, and by tests comparing the generated document to the actual mapped routes.
-- **AC5 — Routing Issues Identified**  
-  Fulfilled by `backend/docs/api-routing-audit.md`, which must record each before/after 404 finding, its root cause, remediation, and the automated test covering it.
+- **All primary, secondary, accent, and neutral colors from `VISUAL_MANIFEST.json` are identified and documented**  
+  Fulfilled by the canonical token mapping in section 2b and by keeping all semantic tokens centralized in `frontend/src/styles.css`.
+- **Current color profile/theme configuration is located in the codebase**  
+  Fulfilled by updating the existing global Tailwind theme definition in `frontend/src/styles.css`.
+- **All color references in the codebase are updated to match `VISUAL_MANIFEST.json` specifications**  
+  Fulfilled by replacing dark theme tokens globally and updating shell/topbar/sidebar components to consume only semantic token-driven classes.
+- **Visual appearance of the application matches the design represented in `VISUAL_MANIFEST.json`**  
+  Fulfilled by moving the app to the manifest’s light palette, font stack, border radius, and shell layout semantics.
+- **No console warnings or errors related to undefined colors or styling**  
+  Fulfilled by preserving compatibility tokens, adding token smoke tests, and running Angular build/test verification.
+- **The change is tested across all major UI components (buttons, links, backgrounds, text, etc.)**  
+  Fulfilled by shell/sidebar/topbar component tests plus the global theme-token spec.
 
 ## 7. Bootstrap scripts
-- Update `bootstrap.sh` and `bootstrap.ps1` to:
-  - restore backend dependencies with `dotnet restore backend/Greenfield.sln`,
-  - install frontend dependencies in `frontend/`,
-  - print backend startup instructions,
-  - print frontend startup instructions,
-  - print API docs URLs:
-    - `http://localhost:5000/api/docs`
-    - `http://localhost:5000/openapi/v1.json`
-  - print a verification command such as:
-    - `dotnet test backend/tests/Greenfield.Api.IntegrationTests/Greenfield.Api.IntegrationTests.csproj`
-- Do not auto-run tests from bootstrap; keep bootstrap fast and idempotent.
+### `bootstrap.sh`
+- Keep command checks for `dotnet` and `npm`.
+- Keep `dotnet restore backend/Greenfield.sln`.
+- Keep `cd frontend && npm install`.
+- Extend the final guidance block with:
+  - `cd frontend && npm run build`
+  - `cd frontend && npm test -- --watch=false --browsers=ChromeHeadless`
+- Keep existing backend run instructions and API documentation URLs.
 
-### 7a. Frontend Contract Updates
-No frontend source-file updates are required for this plan. The backend changes are documentation exposure and backward-compatible routing normalization only; the Angular proxy already forwards `/api/*` requests unchanged.
----
-### Operator Architectural Decisions
-The following decisions were made by the operator during plan review
-and **must be treated as authoritative constraints** by CodingAgent:
-
-- **How should /api/docs be served?** → Lightweight redirect to helper UI route _(decided by slack at 2026-04-30 15:42:56Z)_
-- **Should /health remain after adding /api/health?** → Keep both routes _(decided by auto at 2026-04-30 15:42:56Z)_
-- **How should deviation collection-root paths be handled?** → Canonical /api/deviations only _(decided by slack at 2026-04-30 15:42:56Z)_
+### `bootstrap.ps1`
+- Mirror the shell script behavior for Windows developers.
+- Keep `dotnet restore backend/Greenfield.sln` and frontend `npm install`.
+- Extend the final guidance block with the same frontend build/test commands.
+- Keep existing backend run instructions and API documentation URLs.
