@@ -6,7 +6,19 @@ using Greenfield.Infrastructure.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── OpenAPI ────────────────────────────────────────────────────────────────
-builder.Services.AddOpenApi();
+// Read document identity from AppSettings so config drives the generated info.
+var apiTitle   = builder.Configuration["AppSettings:ServiceName"] ?? "Greenfield.Api";
+var apiVersion = builder.Configuration["AppSettings:Version"]     ?? "1.0.0";
+
+builder.Services.AddOpenApi("v1", options =>
+{
+    options.AddDocumentTransformer((document, _, _) =>
+    {
+        document.Info.Title   = apiTitle;
+        document.Info.Version = apiVersion;
+        return Task.CompletedTask;
+    });
+});
 
 // ── Health checks ─────────────────────────────────────────────────────────
 builder.Services.AddHealthChecks();
@@ -31,11 +43,6 @@ builder.Services.AddInfrastructureServices();
 // ─────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 // Redirect to HTTPS only in non-development environments.
 if (!app.Environment.IsDevelopment())
 {
@@ -44,7 +51,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseCors();
 
-// ── Endpoints ─────────────────────────────────────────────────────────────
+// ── OpenAPI + browser docs (available in all environments) ────────────────
+app.MapOpenApiEndpoints();
+
+// ── Business endpoints ────────────────────────────────────────────────────
 app.MapHealthEndpoints();
 app.MapDeviationEndpoints();
 app.MapDashboardEndpoints();

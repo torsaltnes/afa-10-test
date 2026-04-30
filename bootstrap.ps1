@@ -61,5 +61,12 @@ Write-Host "  NOTE: Always use 'npm start' (not 'ng serve' without flags) for"
 Write-Host "  local development. It passes --proxy-config proxy.conf.json so"
 Write-Host "  that every /api/... request is forwarded to the backend without"
 Write-Host "  path rewriting — preserving the /api prefix end-to-end."
+Write-Host ""
+Write-Host "  API Documentation:" -ForegroundColor Yellow
+Write-Host "    Browser UI  : http://localhost:5000/api/docs"
+Write-Host "    OpenAPI JSON: http://localhost:5000/openapi/v1.json"
+Write-Host ""
+Write-Host "  Verification (integration tests):" -ForegroundColor Yellow
+Write-Host "    dotnet test backend/tests/Greenfield.Api.IntegrationTests/Greenfield.Api.IntegrationTests.csproj"
 Write-Host "================================================================" -ForegroundColor Cyan
 Write-Host ""
